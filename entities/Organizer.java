@@ -1,3 +1,4 @@
+package entities;
 public class Organizer extends Person{
     private String emailAddress;
     private String organizationName;

@@ -1,3 +1,4 @@
+package entities;
 public class Attendee extends Person{
     private String emailAddress;
 
