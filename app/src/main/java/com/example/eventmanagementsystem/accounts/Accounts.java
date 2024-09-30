@@ -1,5 +1,5 @@
-//package accounts;
-//
-//public class Accounts {
-//
-//}
+package com.example.eventmanagementsystem.accounts;
+
+public class Accounts {
+
+}
