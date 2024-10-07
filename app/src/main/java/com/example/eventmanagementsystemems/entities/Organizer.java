@@ -4,8 +4,8 @@ public class Organizer extends User{
 
     protected String organizationName;
 
-    public Organizer(String firstName, String lastName, String address, String phoneNumber, String emailAddress, String organizationName){
-        super(firstName, lastName, phoneNumber, emailAddress);
+    public Organizer(String firstName, String lastName, String address, String phoneNumber, String emailAddress, String password, String organizationName){
+        super(firstName, lastName, phoneNumber, emailAddress, password);
         this.organizationName = organizationName;
     }
 
@@ -17,5 +17,5 @@ public class Organizer extends User{
         this.organizationName = organizationName;
     }
 
-    public void register(){}
+    public void requestRegistration(){}
 }

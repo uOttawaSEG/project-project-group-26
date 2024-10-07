@@ -15,6 +15,11 @@ public class Person{
     }
 
     public void setFirstName(String firstName){
+
+        if (firstName == null){
+            throw new IllegalArgumentException("Name is invalid");
+        }
+
         this.firstName = firstName;
     }
 
@@ -23,6 +28,9 @@ public class Person{
     }
 
     public void setLastName(String lastName){
+        if (lastName == null){
+            throw new IllegalArgumentException("Last name is invalid");
+        }
         this.lastName = lastName;
     }
 
