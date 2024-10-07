@@ -1,5 +1,8 @@
 package com.example.eventmanagementsystemems.entities;
 
+/**
+ * Class Attendee that extends User
+ */
 
 public class Attendee extends User{
 
