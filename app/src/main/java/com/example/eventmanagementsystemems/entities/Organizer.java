@@ -1,21 +1,12 @@
 package com.example.eventmanagementsystemems.entities;
-public class Organizer extends Person{
-    private String emailAddress;
-    private String organizationName;
+
+public class Organizer extends User{
+
+    protected String organizationName;
 
     public Organizer(String firstName, String lastName, String address, String phoneNumber, String emailAddress, String organizationName){
-        super(firstName, lastName, address, phoneNumber);
-        this.emailAddress=emailAddress;
-        this.organizationName=organizationName;
-
-    }
-
-    public String getEmailAddress(){
-        return emailAddress;
-    }
-
-    public void setEmailAddress(String emailAddress){
-        this.emailAddress=emailAddress;
+        super(firstName, lastName, phoneNumber, emailAddress);
+        this.organizationName = organizationName;
     }
 
     public String getOrganizationName(){ 
@@ -23,6 +14,8 @@ public class Organizer extends Person{
     }
 
     public void setOrganizationName(String organizationName){
-        this.organizationName=organizationName;
+        this.organizationName = organizationName;
     }
+
+    public void register(){}
 }
