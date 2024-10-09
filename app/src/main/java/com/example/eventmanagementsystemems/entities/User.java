@@ -105,7 +105,7 @@ public abstract class User extends Person {
         } else if (user instanceof Administrator) {
             return "Administrator";
         } else {
-            throw IllegalArgumentException("Unknown User Type");
+            throw new IllegalArgumentException("Unknown User Type");
         }
     }
 
