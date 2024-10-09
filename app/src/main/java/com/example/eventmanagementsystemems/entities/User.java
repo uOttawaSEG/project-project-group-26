@@ -91,6 +91,23 @@ public abstract class User extends Person {
 
         this.password = password;
     }
+    
+    /**
+     * Added this method for the user type, its similar to the method seen in assignment of seg2105
+     * Returns the user's type
+     * @return String
+     */
+    public String getUserType(User user) {
+        if (user instanceof Attendee) {
+            return "Attendee";
+        } else if (user instanceof Organizer) {
+            return "Organizer";
+        } else if (user instanceof Administrator) {
+            return "Administrator";
+        } else {
+            return "Unknown User Type";
+        }
+    }
 
     public abstract void requestRegistration();
 
