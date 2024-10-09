@@ -1,19 +1,14 @@
 package com.example.eventmanagementsystemems.entities;
-public class Attendee extends Person{
-    private String emailAddress;
 
-    
-    public Attendee(String firstName, String lastName, String address, String phoneNumber, String emailAddress){
-        super(firstName, lastName, address, phoneNumber);
-        this.emailAddress=emailAddress;
+/**
+ * Class Attendee that extends User
+ */
 
+public class Attendee extends User{
+
+    public Attendee(String firstName, String lastName, String address, String phoneNumber, String emailAddress, String password){
+        super(firstName, lastName, phoneNumber, emailAddress, password);
     }
 
-    public String getEmailAddress(){
-        return emailAddress;
-    }
-
-    public void setEmailAddress(String emailAddress){
-        this.emailAddress=emailAddress;
-    }
+    public void requestRegistration(){}
 }
