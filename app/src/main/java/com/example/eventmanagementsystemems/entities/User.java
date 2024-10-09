@@ -26,21 +26,21 @@ public abstract class User extends Person {
      * Returns the user's address
      * @return String
      */
-    public String getAddress(){
+    public String getEmailAddress(){
         return emailAddress;
     }
 
     /**
      * Sets the user's email address to the given address
-     * @param address
+     * @param emailAddress
      */
-    public void setAddress(String address){
+    public void setEmailAddress(String emailAddress){
 
-        if (address == null){
-            throw new IllegalArgumentException("Address is invalid");
+        if (emailAddress == null){
+            throw new IllegalArgumentException("Email address is invalid");
         }
 
-        this.emailAddress = address;
+        this.emailAddress = emailAddress;
     }
 
     /**
