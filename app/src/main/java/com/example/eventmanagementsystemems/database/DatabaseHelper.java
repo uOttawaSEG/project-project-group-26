@@ -57,7 +57,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         values.put(COLUMN_FIRST_NAME, user.getFirstName());
         values.put(COLUMN_LAST_NAME, user.getLastNameString());
-        values.put(COLUMN_EMAIL, user.getEmailAddress());
+        values.put(COLUMN_EMAIL, user.getAddress());
         values.put(COLUMN_PASSWORD, user.getPassword());
         values.put(COLUMN_PHONE, user.getPhoneNumber());
         values.put(COLUMN_USER_TYPE, user.getUserType());
