@@ -19,6 +19,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_EMAIL = "email";
     public static final String COLUMN_PASSWORD = "password";
     public static final String COLUMN_PHONE = "phone";
+    public static final String COLUMN_ADDRESS = "address";
     public static final String COLUMN_USER_TYPE = "user_type"; // "Organizer" or "Attendee"
 
     // SQL query to create user table
@@ -30,6 +31,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + COLUMN_PASSWORD + " TEXT,"
             + COLUMN_PHONE + " TEXT,"
             + COLUMN_USER_TYPE + " TEXT"
+            +COLUMN_ADDRESS +"TEXT"
             + ")";
 
     public DatabaseHelper(Context context) {
