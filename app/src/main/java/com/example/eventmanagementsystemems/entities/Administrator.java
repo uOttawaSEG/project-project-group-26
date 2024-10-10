@@ -14,8 +14,8 @@ public class Administrator extends User{
      * @param password
      */
     public Administrator(String firstName, String lastName, String address, String phoneNumber, String emailAddress, String password){
-        super(firstName, lastName, phoneNumber, emailAddress, password);
-        this.address = address;
+        super(firstName, lastName, phoneNumber, emailAddress, password,address);
+
     }
 
     public void requestRegistration(){}

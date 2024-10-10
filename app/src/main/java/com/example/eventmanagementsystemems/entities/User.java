@@ -9,17 +9,19 @@ public abstract class User extends Person {
     protected String phoneNumber;
     protected String emailAddress;
     protected String password;
+    protected String address;
 
     /**
      * Parameterized Constructor that calls its parent constructor with given names
      * and initializes the user's phone number, email address, and password to the given fields.
      *
      */
-    public User (String firstName, String lastName, String phoneNumber, String emailAddress, String password){
+    public User (String firstName, String lastName, String phoneNumber, String emailAddress, String password, String address){
         super(firstName, lastName);
         this.phoneNumber = phoneNumber;
         this.emailAddress = emailAddress;
         this.password = password;
+        this.address = address;
     }
 
     /**
@@ -86,11 +88,25 @@ public abstract class User extends Person {
             throw new IllegalArgumentException("Invalid password");
         }
         if (password.length() < 8 || password.length() > 20) {
-            throw new IllegalArgumentException("Password must be between 3 and 50 characters.");
+            throw new IllegalArgumentException("Password must be between 8 and 20 characters.");
         }
 
         this.password = password;
     }
+    /**
+     * Returns the user's address
+     * @return String
+     */
+
+    public String getAddress(){return address;}
+
+    public void setAddress(String address){
+        if (address == null || address.isEmpty()){
+            throw new IllegalArgumentException("Invalid address");
+        }
+
+    }
+
     
     /**
      * Added this method for the user type, its similar to the method seen in assignment of seg2105
@@ -111,21 +127,5 @@ public abstract class User extends Person {
 
     public abstract void requestRegistration();
 
-    public void logOff(){
-        /*This is the simplest form of logoff I could think of. It's not enough though retalk with everyone 
-        because there's no way we could have a logoff method written in the user class because the user class 
-        is meant to just store information about a user, where as logging off will need to redirect people to 
-        another page and clear their data in the database. Hala2 keep it for now but once the button and everything 
-        is in i think we should move it to another class which manages the users session 
-        (ex: signing in, redirecting to other pages, etc.)*/
 
-        //Nullify the values of the instance to represent that the user has been logged out
-        this.firstName = null;
-        this.lastName = null;
-        this.phoneNumber = null;
-        this.emailAddress = null;
-        this.password = null;
-
-        System.out.println("User has been logged off.");
-    }
 }

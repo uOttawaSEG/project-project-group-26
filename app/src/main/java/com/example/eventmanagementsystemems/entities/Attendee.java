@@ -6,9 +6,10 @@ package com.example.eventmanagementsystemems.entities;
 
 public class Attendee extends User{
 
-    public Attendee(String firstName, String lastName, String address, String phoneNumber, String emailAddress, String password){
-        super(firstName, lastName, phoneNumber, emailAddress, password);
-        this.address = address;
+
+
+    public Attendee(String firstName, String lastName, String phoneNumber, String emailAddress, String password,String address){
+        super(firstName, lastName, phoneNumber, emailAddress, password, address);
     }
 
     public void requestRegistration(){}

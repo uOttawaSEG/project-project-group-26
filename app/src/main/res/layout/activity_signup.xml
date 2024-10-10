@@ -14,8 +14,8 @@
         <EditText
             android:id="@+id/etFirstName"
             android:layout_width="match_parent"
-            android:layout_marginTop="60dp"
             android:layout_height="65dp"
+            android:layout_marginTop="60dp"
             android:hint="First Name" />
 
         <EditText
@@ -48,6 +48,14 @@
             android:layout_marginTop="12dp"
             android:hint="Phone Number"
             android:inputType="phone" />
+
+        <EditText
+            android:id="@+id/etAddress"
+            android:layout_width="match_parent"
+            android:layout_height="65dp"
+            android:layout_marginTop="12dp"
+            android:hint="Address"
+            android:inputType="textPostalAddress" />
 
         <RadioGroup
             android:id="@+id/rgUserType"

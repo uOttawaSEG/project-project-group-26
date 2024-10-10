@@ -11,16 +11,18 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.eventmanagementsystemems.database.DatabaseHelper;
+import com.example.eventmanagementsystemems.entities.Attendee;
 import com.example.eventmanagementsystemems.entities.User;
 import com.example.eventmanagementsystemems.R;
 
 public class SignUpActivity extends AppCompatActivity {
 
-    private EditText etFirstName, etLastName, etEmail, etPassword, etPhone;
+    private EditText etFirstName, etLastName, etEmail, etPassword, etPhone, etHomeAddress;
     private RadioGroup rgUserType;
     private RadioButton rbAttendee, rbOrganizer;
     private Button btnSignup;
     private DatabaseHelper dbHelper;
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +35,7 @@ public class SignUpActivity extends AppCompatActivity {
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         etPhone = findViewById(R.id.etPhone);
+        etHomeAddress = findViewById(R.id.etAddress);
         rgUserType = findViewById(R.id.rgUserType);
         rbAttendee = findViewById(R.id.rbAttendee);
         rbOrganizer = findViewById(R.id.rbOrganizer);
@@ -55,10 +58,11 @@ public class SignUpActivity extends AppCompatActivity {
         String emailAddress = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString();
         String phoneNumber = etPhone.getText().toString().trim();
+        String address = etHomeAddress.getText().toString().trim();
         String userType = rbAttendee.isChecked() ? "Attendee" : "Organizer";
 
         // Input validation
-        if (firstName.isEmpty() || lastName.isEmpty() || emailAddress.isEmpty() || password.isEmpty() || phoneNumber.isEmpty()) {
+        if (firstName.isEmpty() || lastName.isEmpty() || emailAddress.isEmpty() || password.isEmpty() || phoneNumber.isEmpty() || address.isEmpty()) {
             Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -68,8 +72,12 @@ public class SignUpActivity extends AppCompatActivity {
             return;
         }
 
+
         // Create new User object
-        User user = new User(firstName, lastName, emailAddress, password, phoneNumber, userType);
+        if(userType.equals("Attendee")){
+            user = new Attendee(firstName, lastName, emailAddress, password, phoneNumber, address);
+        }
+
 
         // Add user to database
         boolean isInserted = dbHelper.addUser(user);

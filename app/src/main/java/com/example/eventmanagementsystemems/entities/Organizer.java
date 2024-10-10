@@ -12,10 +12,9 @@ public class Organizer extends User{
      * Parameterized Constructor that calls parent constructor with given fields and
      * and initializes the organization name field to the given name.
      */
-    public Organizer(String firstName, String lastName, String address, String phoneNumber, String emailAddress, String password, String organizationName){
-        super(firstName, lastName, phoneNumber, emailAddress, password);
+    public Organizer(String firstName, String lastName, String phoneNumber, String emailAddress, String password,String address, String organizationName){
+        super(firstName, lastName, phoneNumber, emailAddress, password, address);
         this.organizationName = organizationName;
-        this.address = address;
     }
 
     /**
