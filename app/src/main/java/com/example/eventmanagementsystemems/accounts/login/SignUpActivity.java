@@ -1,6 +1,7 @@
 package com.example.eventmanagementsystemems.accounts.login;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -8,12 +9,23 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.eventmanagementsystemems.database.DatabaseHelper;
-import com.example.eventmanagementsystemems.entities.Attendee;
-import com.example.eventmanagementsystemems.entities.User;
 import com.example.eventmanagementsystemems.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -21,13 +33,21 @@ public class SignUpActivity extends AppCompatActivity {
     private RadioGroup rgUserType;
     private RadioButton rbAttendee, rbOrganizer;
     private Button btnSignup;
-    private DatabaseHelper dbHelper;
-    private User user;
+
+    private FirebaseAuth mAuth;
+    private DatabaseReference usersRef;
+
+    private static final String TAG = "SignUpActivity"; // For logging
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
+
+        // Initialize Firebase
+        FirebaseApp.initializeApp(this);
+        mAuth = FirebaseAuth.getInstance();
+        usersRef = FirebaseDatabase.getInstance().getReference("users");
 
         // Initialize UI elements
         etFirstName = findViewById(R.id.etFirstName);
@@ -40,8 +60,6 @@ public class SignUpActivity extends AppCompatActivity {
         rbAttendee = findViewById(R.id.rbAttendee);
         rbOrganizer = findViewById(R.id.rbOrganizer);
         btnSignup = findViewById(R.id.btnSignup);
-
-        dbHelper = new DatabaseHelper(this);
 
         btnSignup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,26 +85,46 @@ public class SignUpActivity extends AppCompatActivity {
             return;
         }
 
-        if (dbHelper.isEmailExists(emailAddress)) {
-            Toast.makeText(this, "Email already registered", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        // Create user with Firebase Authentication
+        mAuth.createUserWithEmailAndPassword(emailAddress, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign-up success
+                            String userId = mAuth.getCurrentUser().getUid();
 
+                            // Create user profile data
+                            Map<String, Object> userProfile = new HashMap<>();
+                            userProfile.put("firstName", firstName);
+                            userProfile.put("lastName", lastName);
+                            userProfile.put("email", emailAddress);
+                            userProfile.put("phoneNumber", phoneNumber);
+                            userProfile.put("address", address);
+                            userProfile.put("userType", userType);
 
-        // Create new User object
-        if(userType.equals("Attendee")){
-            user = new Attendee(firstName, lastName, emailAddress, password, phoneNumber, address);
-        }
+                            // Save user profile data in Realtime Database
+                            usersRef.child(userId).setValue(userProfile)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                Toast.makeText(SignUpActivity.this, "Registration Successful", Toast.LENGTH_SHORT).show();
+                                                // Redirect to login or main activity
+                                                finish();
+                                            } else {
+                                                Toast.makeText(SignUpActivity.this, "Failed to save user profile", Toast.LENGTH_SHORT).show();
+                                                Log.w(TAG, "Error adding document", task.getException());
+                                            }
+                                        }
+                                    });
 
-
-        // Add user to database
-        boolean isInserted = dbHelper.addUser(user);
-        if (isInserted) {
-            Toast.makeText(this, "Registration Successful", Toast.LENGTH_SHORT).show();
-            // Redirect to login or main activity
-            finish();
-        } else {
-            Toast.makeText(this, "Registration Failed", Toast.LENGTH_SHORT).show();
-        }
+                        } else {
+                            // If sign-up fails, display a message to the user.
+                            Toast.makeText(SignUpActivity.this, "Registration Failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                        }
+                    }
+                });
     }
 }

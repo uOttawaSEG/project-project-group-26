@@ -1,12 +1,8 @@
 package com.example.eventmanagementsystemems.entities;
 
-/**
- * Class Person (parent of User)
- */
-
 import androidx.annotation.NonNull;
 
-public class Person{
+public class Person {
     protected String firstName, lastName;
 
     public Person(String firstName, String lastName){
@@ -27,11 +23,9 @@ public class Person{
      * @param firstName
      */
     public void setFirstName(String firstName){
-
-        if (firstName == null){
+        if (firstName == null || firstName.isEmpty()){
             throw new IllegalArgumentException("Name is invalid");
         }
-
         this.firstName = firstName;
     }
 
@@ -39,7 +33,7 @@ public class Person{
      * Returns the person's last name
      * @return String
      */
-    public String getLastNameString(){
+    public String getLastName(){
         return lastName;
     }
 
@@ -48,17 +42,15 @@ public class Person{
      * @param lastName
      */
     public void setLastName(String lastName){
-        if (lastName == null){
+        if (lastName == null || lastName.isEmpty()){
             throw new IllegalArgumentException("Last name is invalid");
         }
         this.lastName = lastName;
     }
 
-
     @NonNull
     public String toString() {
         return "Account created successfully!\n" +
                 "Name: " + firstName + " " + lastName + "\n";
-                //"Phone: " + phoneNumber + "\n";
     }
 }

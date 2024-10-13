@@ -4,15 +4,15 @@ package com.example.eventmanagementsystemems.entities;
  * Class Organizer that extends User
  */
 
-public class Organizer extends User{
+public class Organizer extends User {
 
     protected String organizationName;
 
     /**
      * Parameterized Constructor that calls parent constructor with given fields and
-     * and initializes the organization name field to the given name.
+     * initializes the organization name field to the given name.
      */
-    public Organizer(String firstName, String lastName, String phoneNumber, String emailAddress, String password,String address, String organizationName){
+    public Organizer(String firstName, String lastName, String phoneNumber, String emailAddress, String password, String address, String organizationName){
         super(firstName, lastName, phoneNumber, emailAddress, password, address);
         this.organizationName = organizationName;
     }
@@ -21,7 +21,7 @@ public class Organizer extends User{
      * Returns the organization name that the user belongs to
      * @return String
      */
-    public String getOrganizationName(){ 
+    public String getOrganizationName(){
         return organizationName;
     }
 
@@ -33,5 +33,7 @@ public class Organizer extends User{
         this.organizationName = organizationName;
     }
 
-    public void requestRegistration(){}
+    public void requestRegistration(){
+        // Implementation code
+    }
 }

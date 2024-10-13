@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.eventmanagementsystemems.accounts.login.LoginActivity;
 import com.example.eventmanagementsystemems.accounts.login.SignUpActivity;
-import com.example.eventmanagementsystemems.R;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -19,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         // Initialize UI elements
         btnLogin = findViewById(R.id.btnLogin);

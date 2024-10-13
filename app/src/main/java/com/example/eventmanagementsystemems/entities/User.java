@@ -13,19 +13,18 @@ public abstract class User extends Person {
 
     /**
      * Parameterized Constructor that calls its parent constructor with given names
-     * and initializes the user's phone number, email address, and password to the given fields.
-     *
+     * and initializes the user's phone number, email address, password, and address.
      */
-    public User (String firstName, String lastName, String phoneNumber, String emailAddress, String password, String address){
+    public User(String firstName, String lastName, String phoneNumber, String emailAddress, String password, String address){
         super(firstName, lastName);
-        this.phoneNumber = phoneNumber;
-        this.emailAddress = emailAddress;
-        this.password = password;
-        this.address = address;
+        setPhoneNumber(phoneNumber);
+        setEmailAddress(emailAddress);
+        setPassword(password);
+        setAddress(address);
     }
 
     /**
-     * Returns the user's address
+     * Returns the user's email address
      * @return String
      */
     public String getEmailAddress(){
@@ -37,11 +36,9 @@ public abstract class User extends Person {
      * @param emailAddress
      */
     public void setEmailAddress(String emailAddress){
-
-        if (emailAddress == null){
+        if (emailAddress == null || emailAddress.isEmpty()){
             throw new IllegalArgumentException("Email address is invalid");
         }
-
         this.emailAddress = emailAddress;
     }
 
@@ -58,8 +55,7 @@ public abstract class User extends Person {
      * @param phoneNumber
      */
     public void setPhoneNumber(String phoneNumber){
-
-        if (phoneNumber == null){
+        if (phoneNumber == null || phoneNumber.isEmpty()){
             throw new IllegalArgumentException("Phone number is invalid");
         }
 
@@ -68,7 +64,7 @@ public abstract class User extends Person {
         }
 
         try{
-            Integer.parseInt(phoneNumber);
+            Long.parseLong(phoneNumber);
         }
         catch (NumberFormatException e){
             throw new IllegalArgumentException("Phone number must contain only numbers");
@@ -90,35 +86,31 @@ public abstract class User extends Person {
         if (password.length() < 8 || password.length() > 20) {
             throw new IllegalArgumentException("Password must be between 8 and 20 characters.");
         }
-
         this.password = password;
     }
     /**
      * Returns the user's address
      * @return String
      */
-
-    public String getAddress(){return address;}
+    public String getAddress(){ return address; }
 
     public void setAddress(String address){
         if (address == null || address.isEmpty()){
             throw new IllegalArgumentException("Invalid address");
         }
-
+        this.address = address;
     }
 
-    
     /**
-     * Added this method for the user type, its similar to the method seen in assignment of seg2105
      * Returns the user's type
      * @return String
      */
-    public String getUserType(User user) {
-        if (user instanceof Attendee) {
+    public String getUserType() {
+        if (this instanceof Attendee) {
             return "Attendee";
-        } else if (user instanceof Organizer) {
+        } else if (this instanceof Organizer) {
             return "Organizer";
-        } else if (user instanceof Administrator) {
+        } else if (this instanceof Administrator) {
             return "Administrator";
         } else {
             throw new IllegalArgumentException("Unknown User Type");
@@ -126,6 +118,4 @@ public abstract class User extends Person {
     }
 
     public abstract void requestRegistration();
-
-
 }

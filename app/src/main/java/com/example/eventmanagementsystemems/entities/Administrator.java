@@ -1,6 +1,6 @@
 package com.example.eventmanagementsystemems.entities;
 
-public class Administrator extends User{
+public class Administrator extends User {
 
     /**
      * Parameterized Constructor that calls its parent constructor with given names
@@ -8,15 +8,16 @@ public class Administrator extends User{
      *
      * @param firstName
      * @param lastName
-     * @param address
      * @param phoneNumber
      * @param emailAddress
      * @param password
+     * @param address
      */
-    public Administrator(String firstName, String lastName, String address, String phoneNumber, String emailAddress, String password){
-        super(firstName, lastName, phoneNumber, emailAddress, password,address);
-
+    public Administrator(String firstName, String lastName, String phoneNumber, String emailAddress, String password, String address){
+        super(firstName, lastName, phoneNumber, emailAddress, password, address);
     }
 
-    public void requestRegistration(){}
+    public void requestRegistration(){
+        // Implementation code
+    }
 }
