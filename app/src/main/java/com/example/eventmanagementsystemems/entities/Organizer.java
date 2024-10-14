@@ -14,7 +14,7 @@ public class Organizer extends User {
      */
     public Organizer(String firstName, String lastName, String phoneNumber, String emailAddress, String password, String address, String organizationName){
         super(firstName, lastName, phoneNumber, emailAddress, password, address);
-        this.organizationName = organizationName;
+        setOrganizationName(organizationName);
     }
 
     /**

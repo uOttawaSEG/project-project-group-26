@@ -110,8 +110,6 @@ public abstract class User extends Person {
             return "Attendee";
         } else if (this instanceof Organizer) {
             return "Organizer";
-        } else if (this instanceof Administrator) {
-            return "Administrator";
         } else {
             throw new IllegalArgumentException("Unknown User Type");
         }
