@@ -21,6 +21,6 @@
         android:id="@+id/btnLogoff"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Logoff" />
+        android:text="Log Off" />
 
 </LinearLayout>
