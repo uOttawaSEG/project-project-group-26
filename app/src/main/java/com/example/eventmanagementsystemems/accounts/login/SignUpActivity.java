@@ -1,5 +1,6 @@
 package com.example.eventmanagementsystemems.accounts.login;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -13,7 +14,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.eventmanagementsystemems.MainActivity;
 import com.example.eventmanagementsystemems.R;
+import com.example.eventmanagementsystemems.WelcomeScreen;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
@@ -65,6 +68,9 @@ public class SignUpActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 handleSignup();
+
+                Intent intent = new Intent(SignUpActivity.this, WelcomeScreen.class);
+                startActivity(intent);
             }
         });
     }
@@ -111,6 +117,9 @@ public class SignUpActivity extends AppCompatActivity {
                                             if (task.isSuccessful()) {
                                                 Toast.makeText(SignUpActivity.this, "Registration Successful", Toast.LENGTH_SHORT).show();
                                                 // Redirect to login or main activity
+                                                      Intent intent = new Intent(SignUpActivity.this, WelcomeScreen.class);
+                                                      intent.putExtra("userType", userType); // Pass the userType to WelcomeScreen
+                                                      startActivity(intent);
                                                 finish();
                                             } else {
                                                 Toast.makeText(SignUpActivity.this, "Failed to save user profile", Toast.LENGTH_SHORT).show();
