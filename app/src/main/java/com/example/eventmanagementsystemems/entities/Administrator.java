@@ -14,7 +14,4 @@ public class Administrator extends Person {
         super(firstName, lastName);
     }
 
-    public void requestRegistration(){
-        // Implementation code
-    }
 }
