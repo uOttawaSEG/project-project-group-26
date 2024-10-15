@@ -115,5 +115,4 @@ public abstract class User extends Person {
         }
     }
 
-    public abstract void requestRegistration();
 }

@@ -33,7 +33,4 @@ public class Organizer extends User {
         this.organizationName = organizationName;
     }
 
-    public void requestRegistration(){
-        // Implementation code
-    }
 }

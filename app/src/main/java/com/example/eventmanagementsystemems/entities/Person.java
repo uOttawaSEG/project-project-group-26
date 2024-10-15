@@ -2,6 +2,10 @@ package com.example.eventmanagementsystemems.entities;
 
 import androidx.annotation.NonNull;
 
+/**
+ * Parent Class Person
+ */
+
 public class Person {
     protected String firstName, lastName;
 

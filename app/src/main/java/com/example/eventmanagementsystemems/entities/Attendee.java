@@ -10,7 +10,4 @@ public class Attendee extends User {
         super(firstName, lastName, phoneNumber, emailAddress, password, address);
     }
 
-    public void requestRegistration(){
-        // Implementation code
-    }
 }
