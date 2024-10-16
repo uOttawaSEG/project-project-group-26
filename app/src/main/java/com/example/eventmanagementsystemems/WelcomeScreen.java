@@ -27,7 +27,7 @@ public class WelcomeScreen extends AppCompatActivity {
         Intent intent = getIntent();
         String userType = intent.getStringExtra("userType");
         if (userType != null) {
-            tvWelcomeMessage.setText("Welcome, " + userType + "!");
+            tvWelcomeMessage.setText("Welcome! You are logged in as" + userType + ".");
         }
         btnLogoff = findViewById(R.id.btnLogoff);
         btnLogoff.setOnClickListener(new View.OnClickListener(){
