@@ -1,129 +1,77 @@
+// User.java
 package com.example.eventmanagementsystemems.entities;
 
 /**
  * Abstract Class User that extends Person
  */
-
 public abstract class User extends Person {
 
     protected String phoneNumber;
-    protected String emailAddress;
-    protected String password;
     protected String address;
 
     /**
-     * Parameterized Constructor that calls its parent constructor with given names
-     * and initializes the user's phone number, email address, password, and address.
+     * Constructor initializes the user's name, email, password, phone number, and address
      */
-    public User(String firstName, String lastName, String phoneNumber, String emailAddress, String password, String address){
-        super(firstName, lastName);
+    public User(String firstName, String lastName, String emailAddress, String password, String phoneNumber, String address){
+        super(firstName, lastName, emailAddress, password);
         setPhoneNumber(phoneNumber);
-        setEmailAddress(emailAddress);
-        setPassword(password);
         setAddress(address);
     }
 
     /**
-     * Constructor for Administrator (without phoneNumber and address)
-     */
-    public User(String firstName, String lastName, String emailAddress, String password) {
-        super(firstName, lastName);
-        setEmailAddress(emailAddress);
-        setPassword(password);
-    }
-
-    /**
-     * Returns the user's email address
-     * @return String
-     */
-    public String getEmailAddress(){
-        return emailAddress;
-    }
-
-    /**
-     * Sets the user's email address to the given address
-     * @param emailAddress
-     */
-    public void setEmailAddress(String emailAddress){
-        if (emailAddress == null || emailAddress.isEmpty()){
-            throw new IllegalArgumentException("Email address is invalid");
-        }
-        this.emailAddress = emailAddress;
-    }
-
-    /**
      * Returns the user's phone number
-     * @return String
      */
     public String getPhoneNumber(){
         return phoneNumber;
     }
 
     /**
-     * Sets the user's phone number to the given number
-     * @param phoneNumber
+     * Sets the user's phone number
      */
-    public void setPhoneNumber(String phoneNumber) {
+    public void setPhoneNumber(String phoneNumber){
+        if (phoneNumber == null || phoneNumber.isEmpty()){
+            throw new IllegalArgumentException("Phone number is invalid");
+        }
+        if (phoneNumber.length() != 10){
+            throw new IllegalArgumentException("Phone number must be 10 digits");
+        }
+        try{
+            Long.parseLong(phoneNumber);
+        } catch (NumberFormatException e){
+            throw new IllegalArgumentException("Phone number must contain only numbers");
+        }
         this.phoneNumber = phoneNumber;
     }
-    /**
-     * Returns the user's password
-     * @return String
-     */
-    public String getPassword(){ return password; }
 
-    public void setPassword(String password){
-        if (password == null || password.isEmpty()){
-            throw new IllegalArgumentException("Invalid password");
-        }
-        else if (password.length() < 8 || password.length() > 20) {
-            throw new IllegalArgumentException("Password must be between 8 and 20 characters.");
-        }
-
-        this.password = password;
-    }
     /**
      * Returns the user's address
-     * @return String
      */
     public String getAddress(){ return address; }
 
+    /**
+     * Sets the user's address
+     */
     public void setAddress(String address){
+        if (address == null || address.isEmpty()){
+            throw new IllegalArgumentException("No address entered");
+        } else if (address.length() < 5){
+            throw new IllegalArgumentException("Invalid address");
+        }
         this.address = address;
     }
 
     /**
-     * Returns the user's type
-     * @return String
+     * Abstract method to get user type
      */
-    public String getUserType() {
-        if (this instanceof Attendee) {
-            return "Attendee";
-        } else if (this instanceof Organizer) {
-            return "Organizer";
-        } else if (this instanceof Administrator) {
-            return "Administrator";
-        } else {
-            throw new IllegalArgumentException("Unknown User Type");
-        }
-    }
+    public abstract String getUserType();
 
     /**
-     * Overriding the toString() method in class Person to display
-     * additional User information.
-     * @return String
+     * Overriding the toString() method to display additional User information
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Name: ").append(firstName).append(" ").append(lastName).append("\n")
-          .append("Email: ").append(emailAddress).append("\n");
-        if (phoneNumber != null) {
-            sb.append("Phone Number: ").append(phoneNumber).append("\n");
-        }
-        if (address != null) {
-            sb.append("Address: ").append(address).append("\n");
-        }
-        return sb.toString();
+        return super.toString() +
+               "Phone Number: " + phoneNumber + "\n" +
+               "Address: " + address + "\n";
     }
 }

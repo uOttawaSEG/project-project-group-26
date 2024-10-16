@@ -62,6 +62,16 @@ public class LoginActivity extends AppCompatActivity {
                 handleLogin();
             }
         });
+
+        // Set onClick listener for admin login
+        tvLoginAsAdmin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Navigate to AdminLoginActivity
+                Intent intent = new Intent(LoginActivity.this, AdminLoginActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void handleLogin() {
