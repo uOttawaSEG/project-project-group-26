@@ -24,6 +24,15 @@ public abstract class User extends Person {
     }
 
     /**
+     * Constructor for Administrator (without phoneNumber and address)
+     */
+    public User(String firstName, String lastName, String emailAddress, String password) {
+        super(firstName, lastName);
+        setEmailAddress(emailAddress);
+        setPassword(password);
+    }
+
+    /**
      * Returns the user's email address
      * @return String
      */
@@ -54,25 +63,9 @@ public abstract class User extends Person {
      * Sets the user's phone number to the given number
      * @param phoneNumber
      */
-    public void setPhoneNumber(String phoneNumber){
-        if (phoneNumber == null || phoneNumber.isEmpty()){
-            throw new IllegalArgumentException("Phone number is invalid");
-        }
-
-        if (phoneNumber.length() != 10){
-            throw new IllegalArgumentException("Phone number must be 10 digits");
-        }
-
-        try{
-            Long.parseLong(phoneNumber);
-        }
-        catch (NumberFormatException e){
-            throw new IllegalArgumentException("Phone number must contain only numbers");
-        }
-
+    public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
-
     /**
      * Returns the user's password
      * @return String
@@ -96,13 +89,6 @@ public abstract class User extends Person {
     public String getAddress(){ return address; }
 
     public void setAddress(String address){
-        if (address == null || address.isEmpty()){
-            throw new IllegalArgumentException("No address entered");
-        }
-        else if (address.length() < 5){  // setting a minimum of characters for address
-            throw new IllegalArgumentException("Invalid address");
-        }
-
         this.address = address;
     }
 
@@ -115,6 +101,8 @@ public abstract class User extends Person {
             return "Attendee";
         } else if (this instanceof Organizer) {
             return "Organizer";
+        } else if (this instanceof Administrator) {
+            return "Administrator";
         } else {
             throw new IllegalArgumentException("Unknown User Type");
         }
@@ -127,10 +115,15 @@ public abstract class User extends Person {
      */
     @Override
     public String toString() {
-        return "Account created successfully!\n" +
-                "Name: " + firstName + " " + lastName + "\n" +
-                "Username: " + emailAddress + "\n" +
-                "Phone number: " + phoneNumber + "\n" +
-                "Address: " + address + "\n";
+        StringBuilder sb = new StringBuilder();
+        sb.append("Name: ").append(firstName).append(" ").append(lastName).append("\n")
+          .append("Email: ").append(emailAddress).append("\n");
+        if (phoneNumber != null) {
+            sb.append("Phone Number: ").append(phoneNumber).append("\n");
+        }
+        if (address != null) {
+            sb.append("Address: ").append(address).append("\n");
+        }
+        return sb.toString();
     }
 }

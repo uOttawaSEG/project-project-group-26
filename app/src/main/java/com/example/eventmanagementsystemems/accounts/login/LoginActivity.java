@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -32,6 +33,8 @@ public class LoginActivity extends AppCompatActivity {
     private EditText etEmail, etPassword;
     private Button btnLogin;
 
+    private TextView tvLoginAsAdmin;
+
     private FirebaseAuth mAuth;
     private DatabaseReference usersRef;
 
@@ -49,6 +52,8 @@ public class LoginActivity extends AppCompatActivity {
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
+
+        tvLoginAsAdmin = findViewById(R.id.tvLoginAsAdmin);
 
         // Set onClick listener for login button
         btnLogin.setOnClickListener(new View.OnClickListener() {
