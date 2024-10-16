@@ -9,7 +9,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.eventmanagementsystemems.accounts.logoff.LogoffActivity;
+//import com.example.eventmanagementsystemems.accounts.logoff.LogoffActivity;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class WelcomeScreen extends AppCompatActivity {
