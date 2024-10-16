@@ -3,34 +3,35 @@ package com.example.eventmanagementsystemems.entities;
 /**
  * Class Organizer that extends User
  */
-
 public class Organizer extends User {
 
-    protected String organizationName;
+    private String organizationName;
 
-    /**
-     * Parameterized Constructor that calls parent constructor with given fields and
-     * initializes the organization name field to the given name.
-     */
-    public Organizer(String firstName, String lastName, String phoneNumber, String emailAddress, String password, String address, String organizationName){
-        super(firstName, lastName, phoneNumber, emailAddress, password, address);
+    public Organizer(String firstName, String lastName, String emailAddress, String password, String phoneNumber, String address, String organizationName){
+        super(firstName, lastName, emailAddress, password, phoneNumber, address);
         setOrganizationName(organizationName);
     }
 
-    /**
-     * Returns the organization name that the user belongs to
-     * @return String
-     */
     public String getOrganizationName(){
         return organizationName;
     }
 
-    /**
-     * Sets the organizer's organization to the given name
-     * @param organizationName
-     */
     public void setOrganizationName(String organizationName){
+        if (organizationName == null || organizationName.isEmpty()){
+            throw new IllegalArgumentException("Organization name does not exist.");
+        }
         this.organizationName = organizationName;
     }
 
+    @Override
+    public String getUserType() {
+        return "Organizer";
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() +
+               "Organization: " + organizationName + "\n" +
+               "User Type: Organizer\n";
+    }
 }
