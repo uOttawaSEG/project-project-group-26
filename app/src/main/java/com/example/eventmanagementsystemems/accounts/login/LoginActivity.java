@@ -17,7 +17,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import com.google.firebase.database.DataSnapshot;
@@ -79,21 +78,33 @@ public class LoginActivity extends AppCompatActivity {
                             FirebaseUser currentUser = mAuth.getCurrentUser();
                             String userId = currentUser.getUid();
 
-                            // Retrieve user data from Realtime Database
-                            usersRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                            // Check if user is an attendee
+                            usersRef.child("attendees").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                    if (snapshot.exists()) {
-                                        String firstName = snapshot.child("firstName").getValue(String.class);
-                                        Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-
-                                        // Redirect to WelcomeScreen
-                                        Intent intent = new Intent(LoginActivity.this, WelcomeScreen.class);
-                                        intent.putExtra("FIRST_NAME", firstName != null ? firstName : "");
-                                        startActivity(intent);
-                                        finish();
+                                public void onDataChange(@NonNull DataSnapshot attendeeSnapshot) {
+                                    if (attendeeSnapshot.exists()) {
+                                        String firstName = attendeeSnapshot.child("firstName").getValue(String.class);
+                                        String userType = "Attendee";
+                                        proceedToWelcomeScreen(firstName, userType);
                                     } else {
-                                        Toast.makeText(LoginActivity.this, "No user data found", Toast.LENGTH_SHORT).show();
+                                        // Check if user is an organizer
+                                        usersRef.child("organizers").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot organizerSnapshot) {
+                                                if (organizerSnapshot.exists()) {
+                                                    String firstName = organizerSnapshot.child("firstName").getValue(String.class);
+                                                    String userType = "Organizer";
+                                                    proceedToWelcomeScreen(firstName, userType);
+                                                } else {
+                                                    Toast.makeText(LoginActivity.this, "No user data found", Toast.LENGTH_SHORT).show();
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
+                                                Toast.makeText(LoginActivity.this, "Failed to retrieve user data", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
                                     }
                                 }
 
@@ -110,5 +121,16 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    private void proceedToWelcomeScreen(String firstName, String userType) {
+        Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
+
+        // Redirect to WelcomeScreen
+        Intent intent = new Intent(LoginActivity.this, WelcomeScreen.class);
+        intent.putExtra("FIRST_NAME", firstName != null ? firstName : "");
+        intent.putExtra("userType", userType);
+        startActivity(intent);
+        finish();
     }
 }

@@ -17,6 +17,8 @@
 
         <activity android:name=".accounts.login.SignUpActivity" />
 
+        <activity android:name=".accounts.login.EnterOrganizationActivity" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
