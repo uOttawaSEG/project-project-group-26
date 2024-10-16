@@ -1,3 +1,4 @@
+package com.example.eventmanagementsystemems.accounts.logoff;
 
 import android.content.Intent;
 import android.os.Bundle;
