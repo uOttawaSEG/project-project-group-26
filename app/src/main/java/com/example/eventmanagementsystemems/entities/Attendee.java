@@ -10,4 +10,10 @@ public class Attendee extends User {
         super(firstName, lastName, phoneNumber, emailAddress, password, address);
     }
 
+    @Override
+    public String toString() {
+        return "Account created successfully!\n" +
+                "Name: " + firstName + " " + lastName + "\n";
+    }
+
 }

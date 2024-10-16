@@ -83,9 +83,10 @@ public abstract class User extends Person {
         if (password == null || password.isEmpty()){
             throw new IllegalArgumentException("Invalid password");
         }
-        if (password.length() < 8 || password.length() > 20) {
+        else if (password.length() < 8 || password.length() > 20) {
             throw new IllegalArgumentException("Password must be between 8 and 20 characters.");
         }
+
         this.password = password;
     }
     /**
@@ -96,8 +97,12 @@ public abstract class User extends Person {
 
     public void setAddress(String address){
         if (address == null || address.isEmpty()){
+            throw new IllegalArgumentException("No address entered");
+        }
+        else if (address.length() < 5){  // setting a minimum of characters for address
             throw new IllegalArgumentException("Invalid address");
         }
+
         this.address = address;
     }
 
@@ -115,4 +120,17 @@ public abstract class User extends Person {
         }
     }
 
+    /**
+     * Overriding the toString() method in class Person to display
+     * additional User information.
+     * @return String
+     */
+    @Override
+    public String toString() {
+        return "Account created successfully!\n" +
+                "Name: " + firstName + " " + lastName + "\n" +
+                "Username: " + emailAddress + "\n" +
+                "Phone number: " + phoneNumber + "\n" +
+                "Address: " + address + "\n";
+    }
 }

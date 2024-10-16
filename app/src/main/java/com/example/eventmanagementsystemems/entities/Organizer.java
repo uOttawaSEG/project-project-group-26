@@ -30,6 +30,9 @@ public class Organizer extends User {
      * @param organizationName
      */
     public void setOrganizationName(String organizationName){
+        if (organizationName == null || organizationName.isEmpty()){
+            throw new IllegalArgumentException("Organization name does not exist.");
+        }
         this.organizationName = organizationName;
     }
 
