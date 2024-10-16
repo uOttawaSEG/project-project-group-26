@@ -42,6 +42,7 @@ public class SignUpActivity extends AppCompatActivity {
 
     private static final String TAG = "SignUpActivity"; // For logging
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,9 +69,6 @@ public class SignUpActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 handleSignup();
-
-                Intent intent = new Intent(SignUpActivity.this, WelcomeScreen.class);
-                startActivity(intent);
             }
         });
     }

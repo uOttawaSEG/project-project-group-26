@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.example.eventmanagementsystemems.MainActivity;
 import com.example.eventmanagementsystemems.R;
 import com.example.eventmanagementsystemems.accounts.login.LoginActivity;
 import com.google.firebase.auth.FirebaseAuth;
@@ -35,13 +36,15 @@ public class LogoffActivity extends AppCompatActivity  {
 
     private void handleLogoff(){
         mAuth.signOut();
-        
+
         Toast.makeText(LogoffActivity.this, "Logged off succesfully!", Toast.LENGTH_LONG).show();
-        
-        Intent intent = new Intent(LogoffActivity.this, LoginActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+        Intent intent = new Intent(LogoffActivity.this, MainActivity.class);
+        //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
 
     }
+
+
 }
