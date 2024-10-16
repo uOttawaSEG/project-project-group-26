@@ -2,58 +2,59 @@ package com.example.eventmanagementsystemems.entities;
 
 import androidx.annotation.NonNull;
 
-public class Person{
-    private String firstName, lastName;
-    private String phoneNumber;
-    private String address;
+/**
+ * Parent Class Person
+ */
 
-    public Person(String firstName, String lastName, String address, String phoneNumber){
-        this.firstName=firstName;
-        this.lastName=lastName;
-        this.phoneNumber=phoneNumber;
-        this.address=address;
-        
+public class Person {
+    protected String firstName, lastName;
+
+    public Person(String firstName, String lastName){
+        setFirstName(firstName);
+        setLastName(lastName);
     }
 
+    /**
+     * Returns the person's first name
+     * @return String
+     */
     public String getFirstName(){
         return firstName;
     }
 
+    /**
+     * Sets the person's first name to the given name
+     * @param firstName
+     */
     public void setFirstName(String firstName){
-        this.firstName=firstName;
+        if (firstName == null || firstName.isEmpty()){
+            throw new IllegalArgumentException("Name is invalid");
+        }
+        this.firstName = firstName;
     }
 
-    public String getLastNameString(){
+    /**
+     * Returns the person's last name
+     * @return String
+     */
+    public String getLastName(){
         return lastName;
     }
 
+    /**
+     * Sets the person's last name to the given name
+     * @param lastName
+     */
     public void setLastName(String lastName){
-        this.lastName=lastName;
-    }
-
-    public String getPhoneNumber(){
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber){
-        this.phoneNumber=phoneNumber;
-    }
-
-    public String getAddress(){
-        return address;
-    }
-
-    public void setAddress(String address){
-        this.address=address;
+        if (lastName == null || lastName.isEmpty()){
+            throw new IllegalArgumentException("Last name is invalid");
+        }
+        this.lastName = lastName;
     }
 
     @NonNull
     public String toString() {
         return "Account created successfully!\n" +
-                "Name: " + firstName + " " + lastName + "\n" +
-                "Phone: " + phoneNumber + "\n" +
-                "Address: " + address;
+                "Name: " + firstName + " " + lastName + "\n";
     }
-
-
 }

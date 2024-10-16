@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "140640298233",
+    "project_id": "event-management-system-ems",
+    "storage_bucket": "event-management-system-ems.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:140640298233:android:142311a01bcbc52d3f2e28",
+        "android_client_info": {
+          "package_name": "com.example.eventmanagementsystemems"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCz-10XSapIGGmNpkn5NEH71WCxF1MJWqU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
