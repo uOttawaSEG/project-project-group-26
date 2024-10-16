@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout 
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/main"
+    android:id="@+id/admin_login_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -9,36 +9,25 @@
     android:gravity="center_vertical">
 
     <EditText
-        android:id="@+id/etEmail"
+        android:id="@+id/etAdminEmail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Email Address"
+        android:hint="Admin Email Address"
         android:inputType="textEmailAddress" />
 
     <EditText
-        android:id="@+id/etPassword"
+        android:id="@+id/etAdminPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Password"
+        android:hint="Admin Password"
         android:inputType="textPassword"
         android:layout_marginTop="16dp" />
 
     <Button
-        android:id="@+id/btnLogin"
+        android:id="@+id/btnAdminLogin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Login"
+        android:text="Admin Login"
         android:layout_marginTop="24dp" />
-
-    <TextView
-        android:id="@+id/tvLoginAsAdmin"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Login as admin"
-        android:textColor="@android:color/holo_blue_dark"
-        android:layout_marginTop="16dp"
-        android:layout_gravity="start"
-        android:clickable="true"
-        android:focusable="true"/>
 
 </LinearLayout>

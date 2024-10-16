@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -32,6 +33,8 @@ public class LoginActivity extends AppCompatActivity {
     private EditText etEmail, etPassword;
     private Button btnLogin;
 
+    private TextView tvLoginAsAdmin;
+
     private FirebaseAuth mAuth;
     private DatabaseReference usersRef;
 
@@ -50,11 +53,23 @@ public class LoginActivity extends AppCompatActivity {
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
 
+        tvLoginAsAdmin = findViewById(R.id.tvLoginAsAdmin);
+
         // Set onClick listener for login button
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 handleLogin();
+            }
+        });
+
+        // Set onClick listener for admin login
+        tvLoginAsAdmin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Navigate to AdminLoginActivity
+                Intent intent = new Intent(LoginActivity.this, AdminLoginActivity.class);
+                startActivity(intent);
             }
         });
     }
@@ -79,21 +94,33 @@ public class LoginActivity extends AppCompatActivity {
                             FirebaseUser currentUser = mAuth.getCurrentUser();
                             String userId = currentUser.getUid();
 
-                            // Retrieve user data from Realtime Database
-                            usersRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                            // Check if user is an attendee
+                            usersRef.child("attendees").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                    if (snapshot.exists()) {
-                                        String firstName = snapshot.child("firstName").getValue(String.class);
-                                        Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-
-                                        // Redirect to WelcomeScreen
-                                        Intent intent = new Intent(LoginActivity.this, WelcomeScreen.class);
-                                        intent.putExtra("FIRST_NAME", firstName != null ? firstName : "");
-                                        startActivity(intent);
-                                        finish();
+                                public void onDataChange(@NonNull DataSnapshot attendeeSnapshot) {
+                                    if (attendeeSnapshot.exists()) {
+                                        String firstName = attendeeSnapshot.child("firstName").getValue(String.class);
+                                        String userType = "Attendee";
+                                        proceedToWelcomeScreen(firstName, userType);
                                     } else {
-                                        Toast.makeText(LoginActivity.this, "No user data found", Toast.LENGTH_SHORT).show();
+                                        // Check if user is an organizer
+                                        usersRef.child("organizers").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot organizerSnapshot) {
+                                                if (organizerSnapshot.exists()) {
+                                                    String firstName = organizerSnapshot.child("firstName").getValue(String.class);
+                                                    String userType = "Organizer";
+                                                    proceedToWelcomeScreen(firstName, userType);
+                                                } else {
+                                                    Toast.makeText(LoginActivity.this, "No user data found", Toast.LENGTH_SHORT).show();
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
+                                                Toast.makeText(LoginActivity.this, "Failed to retrieve user data", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
                                     }
                                 }
 
@@ -110,5 +137,16 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    private void proceedToWelcomeScreen(String firstName, String userType) {
+        Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
+
+        // Redirect to WelcomeScreen
+        Intent intent = new Intent(LoginActivity.this, WelcomeScreen.class);
+        intent.putExtra("FIRST_NAME", firstName != null ? firstName : "");
+        intent.putExtra("userType", userType);
+        startActivity(intent);
+        finish();
     }
 }
