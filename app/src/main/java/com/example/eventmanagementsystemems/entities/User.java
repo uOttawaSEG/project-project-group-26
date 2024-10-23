@@ -8,6 +8,7 @@ public abstract class User extends Person {
 
     protected String phoneNumber;
     protected String address;
+    protected int status = 0; // 0: pending 1: accepted 2: rejected
 
     /**
      * Constructor initializes the user's name, email, password, phone number, and address
