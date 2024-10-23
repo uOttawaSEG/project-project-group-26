@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
         btnLogin = findViewById(R.id.btnLogin);
         btnSignup = findViewById(R.id.btnSignup);
 
+
         // Set onClick listeners
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -40,5 +41,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+
+
     }
 }

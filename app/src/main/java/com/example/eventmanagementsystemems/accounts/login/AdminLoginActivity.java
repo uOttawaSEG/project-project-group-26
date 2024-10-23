@@ -11,7 +11,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.eventmanagementsystemems.MainActivity;
 import com.example.eventmanagementsystemems.R;
+import com.example.eventmanagementsystemems.RegistrationRequestsAdmin;
 import com.example.eventmanagementsystemems.WelcomeScreen;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -29,10 +31,11 @@ import com.google.firebase.database.ValueEventListener;
 public class AdminLoginActivity extends AppCompatActivity {
 
     private EditText etAdminEmail, etAdminPassword;
-    private Button btnAdminLogin;
+    private Button btnAdminLogin, btnViewList;
 
     private FirebaseAuth mAuth;
     private DatabaseReference usersRef;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,11 +49,20 @@ public class AdminLoginActivity extends AppCompatActivity {
         etAdminEmail = findViewById(R.id.etAdminEmail);
         etAdminPassword = findViewById(R.id.etAdminPassword);
         btnAdminLogin = findViewById(R.id.btnAdminLogin);
+        btnViewList = findViewById(R.id.viewList);
 
         btnAdminLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 handleAdminLogin();
+            }
+        });
+
+        btnViewList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(AdminLoginActivity.this, RegistrationRequestsAdmin.class);
+                startActivity(intent);
             }
         });
     }
