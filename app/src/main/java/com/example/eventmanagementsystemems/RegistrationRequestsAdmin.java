@@ -2,7 +2,6 @@ package com.example.eventmanagementsystemems;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -20,8 +19,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class RegistrationRequestsAdmin extends AppCompatActivity {
     // Firebase database reference
@@ -48,11 +45,9 @@ public class RegistrationRequestsAdmin extends AppCompatActivity {
         // Get Firebase database reference
         usersRef = FirebaseDatabase.getInstance().getReference("users");
 
-        // Reference for the attendees node
-        attendeesRef = usersRef.child("attendees");
-
-        // Reference for the organizers node
-        organizersRef = usersRef.child("organizers");
+        // Reference for the pending attendees and organizers nodes
+        attendeesRef = usersRef.child("pending").child("attendees");
+        organizersRef = usersRef.child("pending").child("organizers");
 
         // Bind the ListView components from the UI
         attendeeListView = findViewById(R.id.attendeeListView);
@@ -67,7 +62,7 @@ public class RegistrationRequestsAdmin extends AppCompatActivity {
 
     // Method to fetch attendees
     private void retrieveAttendees() {
-        attendeesRef.orderByChild("status").equalTo(0).addListenerForSingleValueEvent(new ValueEventListener() {
+        attendeesRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot attendeeData) {
                 attendeeRequests.clear(); // clear the list
@@ -78,12 +73,10 @@ public class RegistrationRequestsAdmin extends AppCompatActivity {
                     String emailAddress = snapshot.child("email").getValue(String.class);
                     String phoneNumber = snapshot.child("phoneNumber").getValue(String.class);
                     String address = snapshot.child("address").getValue(String.class);
-                    int status = snapshot.child("status").getValue(Integer.class);
                     String userId = snapshot.getKey();
 
                     // Create an Attendee object
-                    Attendee attendee = new Attendee(firstName, lastName, emailAddress, "", phoneNumber, address);
-                    attendee.setStatus(status);
+                    Attendee attendee = new Attendee(firstName, lastName, emailAddress, phoneNumber, address);
                     attendee.setUserId(userId);
 
                     // Add to the attendeeRequests list
@@ -96,13 +89,13 @@ public class RegistrationRequestsAdmin extends AppCompatActivity {
                     @Override
                     public void onApprove(User user) {
                         // Handle approve action
-                        updateUserStatus("attendees", user.getUserId(), 1);
+                        updateUserStatus("attendees", user.getUserId(), "accepted");
                     }
 
                     @Override
                     public void onReject(User user) {
                         // Handle reject action
-                        updateUserStatus("attendees", user.getUserId(), 2);
+                        updateUserStatus("attendees", user.getUserId(), "rejected");
                     }
                 });
 
@@ -118,7 +111,7 @@ public class RegistrationRequestsAdmin extends AppCompatActivity {
 
     // Method to fetch organizers
     private void retrieveOrganizers() {
-        organizersRef.orderByChild("status").equalTo(0).addListenerForSingleValueEvent(new ValueEventListener() {
+        organizersRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot organizerData) {
                 organizerRequests.clear(); // clear the list
@@ -130,12 +123,10 @@ public class RegistrationRequestsAdmin extends AppCompatActivity {
                     String phoneNumber = snapshot.child("phoneNumber").getValue(String.class);
                     String address = snapshot.child("address").getValue(String.class);
                     String organizationName = snapshot.child("organizationName").getValue(String.class);
-                    int status = snapshot.child("status").getValue(Integer.class);
                     String userId = snapshot.getKey();
 
                     // Create an Organizer object
-                    Organizer organizer = new Organizer(firstName, lastName, emailAddress, "", phoneNumber, address, organizationName);
-                    organizer.setStatus(status);
+                    Organizer organizer = new Organizer(firstName, lastName, emailAddress, phoneNumber, address, organizationName);
                     organizer.setUserId(userId);
 
                     // Add to the organizerRequests list
@@ -148,13 +139,13 @@ public class RegistrationRequestsAdmin extends AppCompatActivity {
                     @Override
                     public void onApprove(User user) {
                         // Handle approve action
-                        updateUserStatus("organizers", user.getUserId(), 1);
+                        updateUserStatus("organizers", user.getUserId(), "accepted");
                     }
 
                     @Override
                     public void onReject(User user) {
                         // Handle reject action
-                        updateUserStatus("organizers", user.getUserId(), 2);
+                        updateUserStatus("organizers", user.getUserId(), "rejected");
                     }
                 });
 
@@ -168,19 +159,36 @@ public class RegistrationRequestsAdmin extends AppCompatActivity {
         });
     }
 
-    // Method to update user status
-    private void updateUserStatus(String userType, String userId, int newStatus) {
-        DatabaseReference userRef = usersRef.child(userType).child(userId);
-        Map<String, Object> updates = new HashMap<>();
-        updates.put("status", newStatus);
-        userRef.updateChildren(updates).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                Toast.makeText(RegistrationRequestsAdmin.this, "User status updated", Toast.LENGTH_SHORT).show();
-                // Refresh the lists
-                retrieveAttendees();
-                retrieveOrganizers();
-            } else {
-                Toast.makeText(RegistrationRequestsAdmin.this, "Failed to update user status", Toast.LENGTH_SHORT).show();
+    // Method to update user status by moving them between database sections
+    private void updateUserStatus(String userType, String userId, String newSection) {
+        DatabaseReference fromRef = usersRef.child("pending").child(userType).child(userId);
+        DatabaseReference toRef = usersRef.child(newSection).child(userType).child(userId);
+
+        // Copy data
+        fromRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                toRef.setValue(snapshot.getValue(), new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                        if (databaseError == null) {
+                            // Remove from original location
+                            fromRef.removeValue();
+
+                            Toast.makeText(RegistrationRequestsAdmin.this, "User moved to " + newSection, Toast.LENGTH_SHORT).show();
+                            // Refresh the lists
+                            retrieveAttendees();
+                            retrieveOrganizers();
+                        } else {
+                            Toast.makeText(RegistrationRequestsAdmin.this, "Failed to move user", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(RegistrationRequestsAdmin.this, "Operation cancelled", Toast.LENGTH_SHORT).show();
             }
         });
     }
