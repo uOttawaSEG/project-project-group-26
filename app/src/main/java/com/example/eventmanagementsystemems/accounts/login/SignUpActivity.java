@@ -109,6 +109,7 @@ public class SignUpActivity extends AppCompatActivity {
         }
 
         // Create user with Firebase Authentication
+        String finalOrganizationName = organizationName;
         mAuth.createUserWithEmailAndPassword(emailAddress, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -128,7 +129,7 @@ public class SignUpActivity extends AppCompatActivity {
 
                             // For organizers, include organizationName
                             if (userType.equals("Organizer")) {
-                                userProfile.put("organizationName", organizationName);
+                                userProfile.put("organizationName", finalOrganizationName);
                             }
 
                             // Modify the database path to include "pending"
