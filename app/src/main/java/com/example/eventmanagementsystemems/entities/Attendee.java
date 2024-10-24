@@ -6,8 +6,8 @@ package com.example.eventmanagementsystemems.entities;
  */
 public class Attendee extends User {
 
-    public Attendee(String firstName, String lastName, String emailAddress, String password, String phoneNumber, String address){
-        super(firstName, lastName, emailAddress, password, phoneNumber, address);
+    public Attendee(String firstName, String lastName, String emailAddress, String phoneNumber, String address){
+        super(firstName, lastName, emailAddress, phoneNumber, address);
     }
 
     @Override

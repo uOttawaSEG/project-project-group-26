@@ -74,8 +74,8 @@ public class PendingRequestsActivity extends AppCompatActivity {
                     String address = snapshot.child("address").getValue(String.class);
                     String userId = snapshot.getKey();
 
-                    // Create an Attendee object
-                    Attendee attendee = new Attendee(firstName, lastName, emailAddress, "", phoneNumber, address);
+                    // Create an Attendee object without password
+                    Attendee attendee = new Attendee(firstName, lastName, emailAddress, phoneNumber, address);
                     attendee.setUserId(userId);
 
                     // Add to the pendingRequests list
@@ -107,8 +107,8 @@ public class PendingRequestsActivity extends AppCompatActivity {
                     String organizationName = snapshot.child("organizationName").getValue(String.class);
                     String userId = snapshot.getKey();
 
-                    // Create an Organizer object
-                    Organizer organizer = new Organizer(firstName, lastName, emailAddress, "", phoneNumber, address, organizationName);
+                    // Create an Organizer object without password
+                    Organizer organizer = new Organizer(firstName, lastName, emailAddress, phoneNumber, address, organizationName);
                     organizer.setUserId(userId);
 
                     // Add to the pendingRequests list

@@ -7,8 +7,8 @@ public class Organizer extends User {
 
     private String organizationName;
 
-    public Organizer(String firstName, String lastName, String emailAddress, String password, String phoneNumber, String address, String organizationName){
-        super(firstName, lastName, emailAddress, password, phoneNumber, address);
+    public Organizer(String firstName, String lastName, String emailAddress, String phoneNumber, String address, String organizationName){
+        super(firstName, lastName, emailAddress, phoneNumber, address);
         setOrganizationName(organizationName);
     }
 

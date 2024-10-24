@@ -8,13 +8,22 @@ public abstract class User extends Person {
     protected String phoneNumber;
     protected String address;
     protected String userId;
-    protected int status = 0; // 0: pending 1: accepted 2: rejected
-
+/*
+* I removed the int status field because we're relying on the database structure to track the user's status.
+* Specifically, users are categorized under different sections in the database:
+* users/pending/attendees and users/pending/organizers for pending users.
+* users/accepted/attendees and users/accepted/organizers for accepted users.
+* users/rejected/attendees and users/rejected/organizers for rejected users.
+* By organizing users this way in the database, we can determine a user's status 
+* based on where their data is stored, making the status field redundant.
+*
+* Let me know if you don't want this, but I really feel like this is much easier than keeping track of status in the app.
+*/
     /**
      * Constructor initializes the user's name, email, password, phone number, and address
      */
-    public User(String firstName, String lastName, String emailAddress, String password, String phoneNumber, String address){
-        super(firstName, lastName, emailAddress, password);
+    public User(String firstName, String lastName, String emailAddress, String phoneNumber, String address){
+        super(firstName, lastName, emailAddress);
         setPhoneNumber(phoneNumber);
         setAddress(address);
     }
@@ -84,11 +93,4 @@ public abstract class User extends Person {
         this.userId = userId;
     }
 
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
 }

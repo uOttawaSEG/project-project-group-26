@@ -20,7 +20,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-// Import necessary classes
+
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -74,8 +74,8 @@ public class RejectedRequestsActivity extends AppCompatActivity {
                     String address = snapshot.child("address").getValue(String.class);
                     String userId = snapshot.getKey();
 
-                    // Create an Attendee object
-                    Attendee attendee = new Attendee(firstName, lastName, emailAddress, "", phoneNumber, address);
+                    // Create an Attendee object without password
+                    Attendee attendee = new Attendee(firstName, lastName, emailAddress, phoneNumber, address);
                     attendee.setUserId(userId);
 
                     // Add to the rejectedRequests list
@@ -107,8 +107,8 @@ public class RejectedRequestsActivity extends AppCompatActivity {
                     String organizationName = snapshot.child("organizationName").getValue(String.class);
                     String userId = snapshot.getKey();
 
-                    // Create an Organizer object
-                    Organizer organizer = new Organizer(firstName, lastName, emailAddress, "", phoneNumber, address, organizationName);
+                    // Create an Organizer object without password
+                    Organizer organizer = new Organizer(firstName, lastName, emailAddress, phoneNumber, address, organizationName);
                     organizer.setUserId(userId);
 
                     // Add to the rejectedRequests list
