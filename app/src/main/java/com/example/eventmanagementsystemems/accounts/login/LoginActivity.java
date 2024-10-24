@@ -11,6 +11,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.eventmanagementsystemems.PendingApplicationActivity;
 import com.example.eventmanagementsystemems.WelcomeScreen;
 import com.example.eventmanagementsystemems.R;
 
@@ -94,41 +95,44 @@ public class LoginActivity extends AppCompatActivity {
                             FirebaseUser currentUser = mAuth.getCurrentUser();
                             String userId = currentUser.getUid();
 
-                            // Check if user is an attendee
-                            usersRef.child("attendees").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot attendeeSnapshot) {
-                                    if (attendeeSnapshot.exists()) {
-                                        String firstName = attendeeSnapshot.child("firstName").getValue(String.class);
-                                        String userType = "Attendee";
-                                        proceedToWelcomeScreen(firstName, userType);
-                                    } else {
-                                        // Check if user is an organizer
-                                        usersRef.child("organizers").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot organizerSnapshot) {
-                                                if (organizerSnapshot.exists()) {
-                                                    String firstName = organizerSnapshot.child("firstName").getValue(String.class);
-                                                    String userType = "Organizer";
-                                                    proceedToWelcomeScreen(firstName, userType);
-                                                } else {
-                                                    Toast.makeText(LoginActivity.this, "No user data found", Toast.LENGTH_SHORT).show();
-                                                }
-                                            }
+                            // Check if user is in accepted attendees
+                            usersRef.child("accepted").child("attendees").child(userId)
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot attendeeSnapshot) {
+                                            if (attendeeSnapshot.exists()) {
+                                                String firstName = attendeeSnapshot.child("firstName").getValue(String.class);
+                                                String userType = "Attendee";
+                                                proceedToWelcomeScreen(firstName, userType);
+                                            } else {
+                                                // Check if user is in accepted organizers
+                                                usersRef.child("accepted").child("organizers").child(userId)
+                                                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                                                            @Override
+                                                            public void onDataChange(@NonNull DataSnapshot organizerSnapshot) {
+                                                                if (organizerSnapshot.exists()) {
+                                                                    String firstName = organizerSnapshot.child("firstName").getValue(String.class);
+                                                                    String userType = "Organizer";
+                                                                    proceedToWelcomeScreen(firstName, userType);
+                                                                } else {
+                                                                    // Check if user is in rejected or pending
+                                                                    checkRejectedOrPending(userId);
+                                                                }
+                                                            }
 
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError error) {
-                                                Toast.makeText(LoginActivity.this, "Failed to retrieve user data", Toast.LENGTH_SHORT).show();
+                                                            @Override
+                                                            public void onCancelled(@NonNull DatabaseError error) {
+                                                                Toast.makeText(LoginActivity.this, "Failed to retrieve user data", Toast.LENGTH_SHORT).show();
+                                                            }
+                                                        });
                                             }
-                                        });
-                                    }
-                                }
+                                        }
 
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError error) {
-                                    Toast.makeText(LoginActivity.this, "Failed to retrieve user data", Toast.LENGTH_SHORT).show();
-                                }
-                            });
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+                                            Toast.makeText(LoginActivity.this, "Failed to retrieve user data", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
 
                         } else {
                             // If sign-in fails, display a message to the user.
@@ -137,6 +141,55 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    private void checkRejectedOrPending(String userId) {
+        // Check rejected attendees
+        usersRef.child("rejected").child("attendees").child(userId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot rejectedAttendeeSnapshot) {
+                        if (rejectedAttendeeSnapshot.exists()) {
+                            showRejectedMessage();
+                        } else {
+                            // Check rejected organizers
+                            usersRef.child("rejected").child("organizers").child(userId)
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot rejectedOrganizerSnapshot) {
+                                            if (rejectedOrganizerSnapshot.exists()) {
+                                                showRejectedMessage();
+                                            } else {
+                                                // User is pending
+                                                showPendingMessage();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+                                            Toast.makeText(LoginActivity.this, "Failed to retrieve user data", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Toast.makeText(LoginActivity.this, "Failed to retrieve user data", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void showRejectedMessage() {
+        Toast.makeText(LoginActivity.this, "Your registration was rejected. Please contact the administrator at 123-456-7890.", Toast.LENGTH_LONG).show();
+        mAuth.signOut();
+    }
+
+    private void showPendingMessage() {
+        // Redirect to Pending Application Screen
+        Intent intent = new Intent(LoginActivity.this, PendingApplicationActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     private void proceedToWelcomeScreen(String firstName, String userType) {

@@ -9,14 +9,17 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Theme.EventManagementSystemEMS">
+        <activity android:name=".PendingApplicationActivity" />
+        <activity android:name=".PendingRequestsActivity" />
+        <activity android:name=".RejectedRequestsActivity" />
+        <activity android:name=".accounts.admin.AdminHomeActivity" />
         <activity
-            android:name=".RegistrationRequestsAdmin"
+            android:name=".accounts.login.AdminLoginActivity"
             android:exported="false" />
         <activity android:name=".WelcomeScreen" />
         <activity android:name=".accounts.login.LoginActivity" />
         <activity android:name=".accounts.login.SignUpActivity" />
         <activity android:name=".accounts.login.EnterOrganizationActivity" />
-        <activity android:name=".accounts.login.AdminLoginActivity" />
         <activity
             android:name=".MainActivity"
             android:exported="true">

@@ -14,8 +14,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.eventmanagementsystemems.PendingApplicationActivity;
 import com.example.eventmanagementsystemems.R;
-import com.example.eventmanagementsystemems.WelcomeScreen;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
@@ -105,28 +105,30 @@ public class SignUpActivity extends AppCompatActivity {
                             userProfile.put("phoneNumber", phoneNumber);
                             userProfile.put("address", address);
                             userProfile.put("userType", userType);
-                            userProfile.put("status", 0);
 
-                            // Save user profile data in Realtime Database under "attendees" or "organizers"
-                            usersRef.child(userType.toLowerCase() + "s").child(userId).setValue(userProfile)
+                            // For organizers, include organizationName
+                            if (userType.equals("Organizer")) {
+                                userProfile.put("organizationName", ""); // Empty for now, can be set later
+                            }
+
+                            // Modify the database path to include "pending"
+                            String userTypePath = "pending/" + userType.toLowerCase() + "s";
+
+                            // Save user profile data in Realtime Database under "pending/attendees" or "pending/organizers"
+                            usersRef.child(userTypePath).child(userId).setValue(userProfile)
                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> dbTask) {
                                             if (dbTask.isSuccessful()) {
                                                 Toast.makeText(SignUpActivity.this, "Registration Successful", Toast.LENGTH_SHORT).show();
-                                                // Redirect to EnterOrganizationActivity if userType is Organizer
-                                                if (userType.equals("Organizer")) {
-                                                    Intent intent = new Intent(SignUpActivity.this, EnterOrganizationActivity.class);
-                                                    intent.putExtra("userType", userType);
-                                                    startActivity(intent);
-                                                    finish();
-                                                } else {
-                                                    // Redirect to WelcomeScreen
-                                                    Intent intent = new Intent(SignUpActivity.this, WelcomeScreen.class);
-                                                    intent.putExtra("userType", userType); // Pass the userType to WelcomeScreen
-                                                    startActivity(intent);
-                                                    finish();
-                                                }
+
+                                                // Sign out the user
+                                                mAuth.signOut();
+
+                                                // Redirect to Pending Application Screen
+                                                Intent intent = new Intent(SignUpActivity.this, PendingApplicationActivity.class);
+                                                startActivity(intent);
+                                                finish();
                                             } else {
                                                 Toast.makeText(SignUpActivity.this, "Failed to save user profile", Toast.LENGTH_SHORT).show();
                                                 Log.w(TAG, "Error adding document", dbTask.getException());

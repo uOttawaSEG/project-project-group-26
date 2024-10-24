@@ -12,7 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.eventmanagementsystemems.R;
-import com.example.eventmanagementsystemems.RegistrationRequestsAdmin;
+import com.example.eventmanagementsystemems.accounts.admin.AdminHomeActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
@@ -65,11 +65,11 @@ public class AdminLoginActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign-in success
                             String userEmail = mAuth.getCurrentUser().getEmail();
-                            if (userEmail != null && userEmail.equals("admin@ems.com")) {
+                            if (userEmail != null && userEmail.equals("admin@ems.com")) { // Replace with your admin email
                                 Toast.makeText(AdminLoginActivity.this, "Admin Login Successful", Toast.LENGTH_SHORT).show();
 
-                                // Redirect to RegistrationRequestsAdmin
-                                Intent intent = new Intent(AdminLoginActivity.this, RegistrationRequestsAdmin.class);
+                                // Redirect to AdminHomeActivity
+                                Intent intent = new Intent(AdminLoginActivity.this, AdminHomeActivity.class);
                                 startActivity(intent);
                                 finish();
                             } else {
