@@ -5,8 +5,8 @@ package com.example.eventmanagementsystemems.entities;
  */
 public class Administrator extends Person {
 
-    public Administrator(String firstName, String lastName, String emailAddress, String password){
-        super(firstName, lastName, emailAddress, password);
+    public Administrator(String firstName, String lastName, String emailAddress){
+        super(firstName, lastName, emailAddress);
     }
 
     public String getUserType() {
