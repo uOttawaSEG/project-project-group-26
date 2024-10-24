@@ -31,7 +31,7 @@ import java.util.Map;
 
 public class SignUpActivity extends AppCompatActivity {
 
-    private EditText etFirstName, etLastName, etEmail, etPassword, etPhone, etHomeAddress;
+    private EditText etFirstName, etLastName, etEmail, etPassword, etPhone, etHomeAddress, etOrganizationName;
     private RadioGroup rgUserType;
     private RadioButton rbAttendee, rbOrganizer;
     private Button btnSignup;
@@ -59,10 +59,21 @@ public class SignUpActivity extends AppCompatActivity {
         etPassword = findViewById(R.id.etPassword);
         etPhone = findViewById(R.id.etPhone);
         etHomeAddress = findViewById(R.id.etAddress);
+        etOrganizationName = findViewById(R.id.etOrganizationName); // For Organizer
+
         rgUserType = findViewById(R.id.rgUserType);
         rbAttendee = findViewById(R.id.rbAttendee);
         rbOrganizer = findViewById(R.id.rbOrganizer);
         btnSignup = findViewById(R.id.btnSignup);
+
+        // Show or hide organization name field based on user type
+        rgUserType.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == R.id.rbOrganizer) {
+                etOrganizationName.setVisibility(View.VISIBLE);
+            } else {
+                etOrganizationName.setVisibility(View.GONE);
+            }
+        });
 
         btnSignup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,6 +92,15 @@ public class SignUpActivity extends AppCompatActivity {
         String phoneNumber = etPhone.getText().toString().trim();
         String address = etHomeAddress.getText().toString().trim();
         String userType = rbAttendee.isChecked() ? "Attendee" : "Organizer";
+
+        String organizationName = "";
+        if (userType.equals("Organizer")) {
+            organizationName = etOrganizationName.getText().toString().trim();
+            if (organizationName.isEmpty()) {
+                Toast.makeText(this, "Please enter organization name", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
 
         // Input validation
         if (firstName.isEmpty() || lastName.isEmpty() || emailAddress.isEmpty() || password.isEmpty() || phoneNumber.isEmpty() || address.isEmpty()) {
@@ -108,7 +128,7 @@ public class SignUpActivity extends AppCompatActivity {
 
                             // For organizers, include organizationName
                             if (userType.equals("Organizer")) {
-                                userProfile.put("organizationName", ""); // Empty for now, can be set later
+                                userProfile.put("organizationName", organizationName);
                             }
 
                             // Modify the database path to include "pending"
