@@ -105,6 +105,7 @@ public class SignUpActivity extends AppCompatActivity {
                             userProfile.put("phoneNumber", phoneNumber);
                             userProfile.put("address", address);
                             userProfile.put("userType", userType);
+                            userProfile.put("status", 0);
 
                             // Save user profile data in Realtime Database under "attendees" or "organizers"
                             usersRef.child(userType.toLowerCase() + "s").child(userId).setValue(userProfile)

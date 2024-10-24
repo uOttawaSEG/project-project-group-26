@@ -8,6 +8,7 @@ public abstract class User extends Person {
 
     protected String phoneNumber;
     protected String address;
+    protected String userId;
     protected int status = 0; // 0: pending 1: accepted 2: rejected
 
     /**
@@ -74,5 +75,21 @@ public abstract class User extends Person {
         return super.toString() +
                "Phone Number: " + phoneNumber + "\n" +
                "Address: " + address + "\n";
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 }
