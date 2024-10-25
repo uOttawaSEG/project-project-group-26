@@ -11,8 +11,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.eventmanagementsystemems.PendingApplicationActivity;
 import com.example.eventmanagementsystemems.R;
-import com.example.eventmanagementsystemems.WelcomeScreen;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -29,7 +29,6 @@ public class EnterOrganizationActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private DatabaseReference usersRef;
     private String userId;
-    private String userType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,10 +44,6 @@ public class EnterOrganizationActivity extends AppCompatActivity {
         btnSubmitOrganization = findViewById(R.id.btnSubmitOrganization);
 
         userId = mAuth.getCurrentUser().getUid();
-
-        // Get userType from Intent
-        Intent intent = getIntent();
-        userType = intent.getStringExtra("userType");
 
         btnSubmitOrganization.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,15 +65,17 @@ public class EnterOrganizationActivity extends AppCompatActivity {
         Map<String, Object> updates = new HashMap<>();
         updates.put("organizationName", organizationName);
 
-        // Save under "users/organizers/userId"
-        usersRef.child("organizers").child(userId).updateChildren(updates)
+        // Save under "users/pending/organizers/userId"
+        usersRef.child("pending").child("organizers").child(userId).updateChildren(updates)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Toast.makeText(EnterOrganizationActivity.this, "Organization Name Saved", Toast.LENGTH_SHORT).show();
 
-                        // Redirect to WelcomeScreen
-                        Intent intent = new Intent(EnterOrganizationActivity.this, WelcomeScreen.class);
-                        intent.putExtra("userType", userType);
+                        // Sign out the user
+                        mAuth.signOut();
+
+                        // Redirect to Pending Application Screen
+                        Intent intent = new Intent(EnterOrganizationActivity.this, PendingApplicationActivity.class);
                         startActivity(intent);
                         finish();
                     } else {

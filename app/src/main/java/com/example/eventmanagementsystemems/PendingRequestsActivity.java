@@ -66,20 +66,30 @@ public class PendingRequestsActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot attendeeData) {
                 for (DataSnapshot snapshot : attendeeData.getChildren()) {
-                    // Retrieve values from Firebase snapshot
-                    String firstName = snapshot.child("firstName").getValue(String.class);
-                    String lastName = snapshot.child("lastName").getValue(String.class);
-                    String emailAddress = snapshot.child("email").getValue(String.class);
-                    String phoneNumber = snapshot.child("phoneNumber").getValue(String.class);
-                    String address = snapshot.child("address").getValue(String.class);
-                    String userId = snapshot.getKey();
+                    try {
+                        // Retrieve values from Firebase snapshot
+                        String firstName = snapshot.child("firstName").getValue(String.class);
+                        String lastName = snapshot.child("lastName").getValue(String.class);
+                        String emailAddress = snapshot.child("email").getValue(String.class);
+                        String phoneNumber = snapshot.child("phoneNumber").getValue(String.class);
+                        String address = snapshot.child("address").getValue(String.class);
+                        String userId = snapshot.getKey();
 
-                    // Create an Attendee object without password
-                    Attendee attendee = new Attendee(firstName, lastName, emailAddress, phoneNumber, address);
-                    attendee.setUserId(userId);
+                        // Validate phone number
+                        if (phoneNumber == null || !phoneNumber.matches("\\d{10}")) {
+                            throw new IllegalArgumentException("Invalid phone number for user: " + emailAddress);
+                        }
 
-                    // Add to the pendingRequests list
-                    pendingRequests.add(attendee);
+                        // Create an Attendee object
+                        Attendee attendee = new Attendee(firstName, lastName, emailAddress, phoneNumber, address);
+                        attendee.setUserId(userId);
+
+                        // Add to the pendingRequests list
+                        pendingRequests.add(attendee);
+                    } catch (Exception e) {
+                        Log.e("PendingRequestsActivity", "Error processing attendee: " + e.getMessage());
+                        // Optionally, notify the admin about the invalid data
+                    }
                 }
 
                 // Fetch organizers after attendees are fetched
@@ -98,21 +108,31 @@ public class PendingRequestsActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot organizerData) {
                 for (DataSnapshot snapshot : organizerData.getChildren()) {
-                    // Retrieve values from Firebase snapshot
-                    String firstName = snapshot.child("firstName").getValue(String.class);
-                    String lastName = snapshot.child("lastName").getValue(String.class);
-                    String emailAddress = snapshot.child("email").getValue(String.class);
-                    String phoneNumber = snapshot.child("phoneNumber").getValue(String.class);
-                    String address = snapshot.child("address").getValue(String.class);
-                    String organizationName = snapshot.child("organizationName").getValue(String.class);
-                    String userId = snapshot.getKey();
+                    try {
+                        // Retrieve values from Firebase snapshot
+                        String firstName = snapshot.child("firstName").getValue(String.class);
+                        String lastName = snapshot.child("lastName").getValue(String.class);
+                        String emailAddress = snapshot.child("email").getValue(String.class);
+                        String phoneNumber = snapshot.child("phoneNumber").getValue(String.class);
+                        String address = snapshot.child("address").getValue(String.class);
+                        String organizationName = snapshot.child("organizationName").getValue(String.class);
+                        String userId = snapshot.getKey();
 
-                    // Create an Organizer object without password
-                    Organizer organizer = new Organizer(firstName, lastName, emailAddress, phoneNumber, address, organizationName);
-                    organizer.setUserId(userId);
+                        // Validate phone number
+                        if (phoneNumber == null || !phoneNumber.matches("\\d{10}")) {
+                            throw new IllegalArgumentException("Invalid phone number for user: " + emailAddress);
+                        }
 
-                    // Add to the pendingRequests list
-                    pendingRequests.add(organizer);
+                        // Create an Organizer object
+                        Organizer organizer = new Organizer(firstName, lastName, emailAddress, phoneNumber, address, organizationName);
+                        organizer.setUserId(userId);
+
+                        // Add to the pendingRequests list
+                        pendingRequests.add(organizer);
+                    } catch (Exception e) {
+                        Log.e("PendingRequestsActivity", "Error processing organizer: " + e.getMessage());
+                        // Optionally, notify the admin about the invalid data
+                    }
                 }
 
                 // Update the ListView with pending requests
@@ -199,11 +219,15 @@ public class PendingRequestsActivity extends AppCompatActivity {
                     public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                         if (databaseError == null) {
                             // Remove from original location
-                            fromRef.removeValue();
-
-                            Toast.makeText(PendingRequestsActivity.this, "User moved to " + toSection, Toast.LENGTH_SHORT).show();
-                            // Refresh the list
-                            retrievePendingRequests();
+                            fromRef.removeValue().addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(PendingRequestsActivity.this, "User moved to " + toSection, Toast.LENGTH_SHORT).show();
+                                    // Refresh the list
+                                    retrievePendingRequests();
+                                } else {
+                                    Toast.makeText(PendingRequestsActivity.this, "Failed to remove user from " + fromSection, Toast.LENGTH_SHORT).show();
+                                }
+                            });
                         } else {
                             Toast.makeText(PendingRequestsActivity.this, "Failed to move user", Toast.LENGTH_SHORT).show();
                         }

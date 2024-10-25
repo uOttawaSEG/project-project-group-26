@@ -10,7 +10,6 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -31,7 +30,7 @@ import java.util.Map;
 
 public class SignUpActivity extends AppCompatActivity {
 
-    private EditText etFirstName, etLastName, etEmail, etPassword, etPhone, etHomeAddress, etOrganizationName;
+    private EditText etFirstName, etLastName, etEmail, etPassword, etPhone, etHomeAddress;
     private RadioGroup rgUserType;
     private RadioButton rbAttendee, rbOrganizer;
     private Button btnSignup;
@@ -40,7 +39,6 @@ public class SignUpActivity extends AppCompatActivity {
     private DatabaseReference usersRef;
 
     private static final String TAG = "SignUpActivity"; // For logging
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,21 +57,11 @@ public class SignUpActivity extends AppCompatActivity {
         etPassword = findViewById(R.id.etPassword);
         etPhone = findViewById(R.id.etPhone);
         etHomeAddress = findViewById(R.id.etAddress);
-        etOrganizationName = findViewById(R.id.etOrganizationName); // For Organizer
 
         rgUserType = findViewById(R.id.rgUserType);
         rbAttendee = findViewById(R.id.rbAttendee);
         rbOrganizer = findViewById(R.id.rbOrganizer);
         btnSignup = findViewById(R.id.btnSignup);
-
-        // Show or hide organization name field based on user type
-        rgUserType.setOnCheckedChangeListener((group, checkedId) -> {
-            if (checkedId == R.id.rbOrganizer) {
-                etOrganizationName.setVisibility(View.VISIBLE);
-            } else {
-                etOrganizationName.setVisibility(View.GONE);
-            }
-        });
 
         btnSignup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -93,23 +81,31 @@ public class SignUpActivity extends AppCompatActivity {
         String address = etHomeAddress.getText().toString().trim();
         String userType = rbAttendee.isChecked() ? "Attendee" : "Organizer";
 
-        String organizationName = "";
-        if (userType.equals("Organizer")) {
-            organizationName = etOrganizationName.getText().toString().trim();
-            if (organizationName.isEmpty()) {
-                Toast.makeText(this, "Please enter organization name", Toast.LENGTH_SHORT).show();
-                return;
-            }
-        }
-
         // Input validation
         if (firstName.isEmpty() || lastName.isEmpty() || emailAddress.isEmpty() || password.isEmpty() || phoneNumber.isEmpty() || address.isEmpty()) {
             Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
             return;
         }
 
+        // Email format validation
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(emailAddress).matches()) {
+            Toast.makeText(this, "Please enter a valid email address", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Password strength validation (minimum 6 characters)
+        if (password.length() < 6) {
+            Toast.makeText(this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Phone number validation
+        if (!phoneNumber.matches("\\d{10}")) {
+            Toast.makeText(this, "Please enter a valid 10-digit phone number", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         // Create user with Firebase Authentication
-        String finalOrganizationName = organizationName;
         mAuth.createUserWithEmailAndPassword(emailAddress, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -127,11 +123,6 @@ public class SignUpActivity extends AppCompatActivity {
                             userProfile.put("address", address);
                             userProfile.put("userType", userType);
 
-                            // For organizers, include organizationName
-                            if (userType.equals("Organizer")) {
-                                userProfile.put("organizationName", finalOrganizationName);
-                            }
-
                             // Modify the database path to include "pending"
                             String userTypePath = "pending/" + userType.toLowerCase() + "s";
 
@@ -143,13 +134,22 @@ public class SignUpActivity extends AppCompatActivity {
                                             if (dbTask.isSuccessful()) {
                                                 Toast.makeText(SignUpActivity.this, "Registration Successful", Toast.LENGTH_SHORT).show();
 
-                                                // Sign out the user
-                                                mAuth.signOut();
+                                                if (userType.equals("Organizer")) {
+                                                    // Redirect to EnterOrganizationActivity to collect organization name
+                                                    Intent intent = new Intent(SignUpActivity.this, EnterOrganizationActivity.class);
+                                                    startActivity(intent);
+                                                    finish();
+                                                } else {
+                                                    // For Attendees, proceed to pending screen
+                                                    // Sign out the user
+                                                    mAuth.signOut();
 
-                                                // Redirect to Pending Application Screen
-                                                Intent intent = new Intent(SignUpActivity.this, PendingApplicationActivity.class);
-                                                startActivity(intent);
-                                                finish();
+                                                    // Redirect to Pending Application Screen
+                                                    Intent intent = new Intent(SignUpActivity.this, PendingApplicationActivity.class);
+                                                    startActivity(intent);
+                                                    finish();
+                                                }
+
                                             } else {
                                                 Toast.makeText(SignUpActivity.this, "Failed to save user profile", Toast.LENGTH_SHORT).show();
                                                 Log.w(TAG, "Error adding document", dbTask.getException());

@@ -184,7 +184,7 @@ public class RejectedRequestsActivity extends AppCompatActivity {
         String userTypePath = user instanceof Organizer ? "organizers" : "attendees";
         DatabaseReference fromRef = usersRef.child(fromSection).child(userTypePath).child(user.getUserId());
         DatabaseReference toRef = usersRef.child(toSection).child(userTypePath).child(user.getUserId());
-
+    
         // Copy data
         fromRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -194,22 +194,26 @@ public class RejectedRequestsActivity extends AppCompatActivity {
                     public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                         if (databaseError == null) {
                             // Remove from original location
-                            fromRef.removeValue();
-
-                            Toast.makeText(RejectedRequestsActivity.this, "User moved to " + toSection, Toast.LENGTH_SHORT).show();
-                            // Refresh the list
-                            retrieveRejectedRequests();
+                            fromRef.removeValue().addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(RejectedRequestsActivity.this, "User moved to " + toSection, Toast.LENGTH_SHORT).show();
+                                    // Refresh the list
+                                    retrieveRejectedRequests();
+                                } else {
+                                    Toast.makeText(RejectedRequestsActivity.this, "Failed to remove user from " + fromSection, Toast.LENGTH_SHORT).show();
+                                }
+                            });
                         } else {
                             Toast.makeText(RejectedRequestsActivity.this, "Failed to move user", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
             }
-
+    
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Toast.makeText(RejectedRequestsActivity.this, "Operation cancelled", Toast.LENGTH_SHORT).show();
             }
         });
-    }
+    }    
 }
