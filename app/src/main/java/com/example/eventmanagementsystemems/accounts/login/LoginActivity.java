@@ -181,7 +181,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void showRejectedMessage() {
-        Toast.makeText(LoginActivity.this, "Your registration was rejected. Please contact the administrator at 123-456-7890.", Toast.LENGTH_LONG).show();
+        Toast.makeText(LoginActivity.this, "Your registration was rejected. Contact 613-304-0180 for more info.", Toast.LENGTH_LONG).show();
         mAuth.signOut();
     }
 
