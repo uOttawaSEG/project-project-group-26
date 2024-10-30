@@ -77,7 +77,7 @@ public class PendingRequestsActivity extends AppCompatActivity {
 
                         // Validate phone number
                         if (phoneNumber == null || !phoneNumber.matches("\\d{10}")) {
-                            throw new IllegalArgumentException("Invalid phone number for user: " + emailAddress);
+                            throw new IllegalArgumentException("Invalid phone number for user: " + phoneNumber);
                         }
 
                         // Create an Attendee object
