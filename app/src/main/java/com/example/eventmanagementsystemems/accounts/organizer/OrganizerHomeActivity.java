@@ -7,6 +7,7 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.eventmanagementsystemems.CreateEventActivity;
 import com.example.eventmanagementsystemems.R;
 import com.example.eventmanagementsystemems.ViewEventsActivity;
 
