@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/organizer_home_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp">
+
+    <Button
+        android:id="@+id/btnCreateEvent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Create Event"
+        android:layout_marginBottom="16dp" />
+
+    <Button
+        android:id="@+id/btnUpcomingEvents"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Upcoming Events"
+        android:layout_marginBottom="16dp" />
+
+    <Button
+        android:id="@+id/btnPastEvents"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Past Events" />
+
+</LinearLayout>
