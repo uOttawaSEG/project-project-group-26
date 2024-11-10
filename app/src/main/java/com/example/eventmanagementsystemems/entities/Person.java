@@ -12,6 +12,10 @@ public abstract class Person {
         setEmailAddress(emailAddress);
     }
 
+    public Person() {
+
+    }
+
     // Getters and setters
     public String getFirstName() {
         return firstName;

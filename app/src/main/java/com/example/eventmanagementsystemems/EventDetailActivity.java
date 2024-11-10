@@ -1,8 +1,5 @@
 package com.example.eventmanagementsystemems;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -12,17 +9,11 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.eventmanagementsystemems.entities.Event;
-import com.example.eventmanagementsystemems.entities.User;
 import com.example.eventmanagementsystemems.entities.Attendee;
-import com.example.eventmanagementsystemems.entities.Organizer;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
-import com.google.firebase.database.ValueEventListener;
+import com.example.eventmanagementsystemems.entities.AttendeeListAdapter;
+import com.example.eventmanagementsystemems.entities.Event;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,21 +67,26 @@ public class EventDetailActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot snapshot) {
                 event = snapshot.getValue(Event.class);
 
-                StringBuilder details = new StringBuilder();
-                details.append("Title: ").append(event.getTitle()).append("\n");
-                details.append("Description: ").append(event.getDescription()).append("\n");
-                details.append("Date: ").append(event.getDate()).append("\n");
-                details.append("Start Time: ").append(event.getStartTime()).append("\n");
-                details.append("End Time: ").append(event.getEndTime()).append("\n");
-                details.append("Address: ").append(event.getEventAddress()).append("\n");
+                if (event != null) {
+                    StringBuilder details = new StringBuilder();
+                    details.append("Title: ").append(event.getTitle()).append("\n");
+                    details.append("Description: ").append(event.getDescription()).append("\n");
+                    details.append("Date: ").append(event.getDate()).append("\n");
+                    details.append("Start Time: ").append(event.getStartTime()).append("\n");
+                    details.append("End Time: ").append(event.getEndTime()).append("\n");
+                    details.append("Address: ").append(event.getEventAddress()).append("\n");
 
-                tvEventDetails.setText(details.toString());
+                    tvEventDetails.setText(details.toString());
 
-                if (eventType.equals("upcoming")) {
-                    fetchAttendeeRegistrations();
+                    if (eventType.equals("upcoming")) {
+                        fetchAttendeeRegistrations();
+                    } else {
+                        lvAttendees.setVisibility(View.GONE);
+                        btnApproveAll.setVisibility(View.GONE);
+                    }
                 } else {
-                    lvAttendees.setVisibility(View.GONE);
-                    btnApproveAll.setVisibility(View.GONE);
+                    Toast.makeText(EventDetailActivity.this, "Event not found.", Toast.LENGTH_SHORT).show();
+                    finish();
                 }
             }
 
@@ -107,32 +103,42 @@ public class EventDetailActivity extends AppCompatActivity {
         if (registrations == null || registrations.isEmpty()) {
             // No registrations
             Toast.makeText(this, "No attendee registrations yet.", Toast.LENGTH_SHORT).show();
+            attendeeList.clear();
+            updateAttendeeListView();
             return;
         }
 
         attendeeList.clear();
+        final int[] remaining = {registrations.size()};
 
         for (String attendeeId : registrations.keySet()) {
             String status = registrations.get(attendeeId);
-            if (status.equals("pending")) {
-                // Fetch attendee details
-                usersRef.child("accepted").child("attendees").child(attendeeId)
-                        .addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot snapshot) {
-                                Attendee attendee = snapshot.getValue(Attendee.class);
+            // Include all statuses: pending, accepted, rejected
+            // If you want only pending, use: if (status.equals("pending")) { ... }
+            usersRef.child("accepted").child("attendees").child(attendeeId)
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot snapshot) {
+                            Attendee attendee = snapshot.getValue(Attendee.class);
+                            if (attendee != null) {
                                 attendee.setUserId(attendeeId);
+                                attendee.setRegistrationStatus(status); // Add this method or field in Attendee class
                                 attendeeList.add(attendee);
-
+                            }
+                            remaining[0]--;
+                            if (remaining[0] == 0) {
                                 updateAttendeeListView();
                             }
+                        }
 
-                            @Override
-                            public void onCancelled(DatabaseError error) {
-                                // Handle error
+                        @Override
+                        public void onCancelled(DatabaseError error) {
+                            remaining[0]--;
+                            if (remaining[0] == 0) {
+                                updateAttendeeListView();
                             }
-                        });
-            }
+                        }
+                    });
         }
     }
 

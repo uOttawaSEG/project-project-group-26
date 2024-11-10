@@ -16,6 +16,7 @@ public class Event {
 
     // Default constructor required for calls to DataSnapshot.getValue(Event.class)
     public Event() {
+        this.attendeeRegistrations = new HashMap<>();
     }
 
     public Event(String eventId, String title, String description, String date, String startTime,

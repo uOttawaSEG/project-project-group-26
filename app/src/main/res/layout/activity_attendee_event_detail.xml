@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView 
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/event_detail_layout"
+    android:id="@+id/attendee_event_detail_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp">
@@ -17,24 +17,18 @@
             android:layout_height="wrap_content"
             android:textSize="16sp"/>
 
-        <Button
-            android:id="@+id/btnApproveAll"
+        <TextView
+            android:id="@+id/tvRegistrationStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Approve All"
-            android:layout_marginTop="16dp"/>
-
-        <ListView
-            android:id="@+id/lvAttendees"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"/>
+            android:textSize="16sp"
+            android:layout_marginTop="8dp"/>
 
         <Button
-            android:id="@+id/btnDeleteEvent"
+            android:id="@+id/btnRegister"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Delete Event"
+            android:text="Register"
             android:layout_marginTop="16dp"/>
 
     </LinearLayout>

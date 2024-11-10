@@ -33,6 +33,9 @@
         <activity android:name=".accounts.organizer.OrganizerHomeActivity" />
         <activity android:name=".ViewEventsActivity" />
         <activity android:name=".EventDetailActivity" />
+        <activity android:name=".AttendeeViewEventsActivity" />
+        <activity android:name=".AttendeeEventDetailActivity" />
+        <activity android:name=".AttendeeRegisteredEventsActivity" />
 
     </application>
 

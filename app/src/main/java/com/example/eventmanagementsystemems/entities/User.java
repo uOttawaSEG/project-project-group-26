@@ -28,6 +28,10 @@ public abstract class User extends Person {
         setAddress(address);
     }
 
+    public User() {
+        super();
+    }
+
     /**
      * Returns the user's phone number
      */

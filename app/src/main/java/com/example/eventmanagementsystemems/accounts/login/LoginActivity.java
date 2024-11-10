@@ -11,6 +11,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+// Import the new AttendeeViewEventsActivity
+import com.example.eventmanagementsystemems.AttendeeViewEventsActivity;
 import com.example.eventmanagementsystemems.PendingApplicationActivity;
 import com.example.eventmanagementsystemems.WelcomeScreen;
 import com.example.eventmanagementsystemems.R;
@@ -103,7 +105,7 @@ public class LoginActivity extends AppCompatActivity {
                                             if (attendeeSnapshot.exists()) {
                                                 String firstName = attendeeSnapshot.child("firstName").getValue(String.class);
                                                 String userType = "Attendee";
-                                                proceedToWelcomeScreen(firstName, userType);
+                                                proceedToNextScreen(firstName, userType);
                                             } else {
                                                 // Check if user is in accepted organizers
                                                 usersRef.child("accepted").child("organizers").child(userId)
@@ -113,10 +115,28 @@ public class LoginActivity extends AppCompatActivity {
                                                                 if (organizerSnapshot.exists()) {
                                                                     String firstName = organizerSnapshot.child("firstName").getValue(String.class);
                                                                     String userType = "Organizer";
-                                                                    proceedToWelcomeScreen(firstName, userType);
+                                                                    proceedToNextScreen(firstName, userType);
                                                                 } else {
-                                                                    // Check if user is in rejected or pending
-                                                                    checkRejectedOrPending(userId);
+                                                                    // Check if user is in admins
+                                                                    usersRef.child("admins").child(userId)
+                                                                            .addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                                @Override
+                                                                                public void onDataChange(@NonNull DataSnapshot adminSnapshot) {
+                                                                                    if (adminSnapshot.exists()) {
+                                                                                        String firstName = adminSnapshot.child("firstName").getValue(String.class);
+                                                                                        String userType = "Administrator";
+                                                                                        proceedToNextScreen(firstName, userType);
+                                                                                    } else {
+                                                                                        // Check if user is in rejected or pending
+                                                                                        checkRejectedOrPending(userId);
+                                                                                    }
+                                                                                }
+
+                                                                                @Override
+                                                                                public void onCancelled(@NonNull DatabaseError error) {
+                                                                                    Toast.makeText(LoginActivity.this, "Failed to retrieve user data", Toast.LENGTH_SHORT).show();
+                                                                                }
+                                                                            });
                                                                 }
                                                             }
 
@@ -192,14 +212,23 @@ public class LoginActivity extends AppCompatActivity {
         finish();
     }
 
-    private void proceedToWelcomeScreen(String firstName, String userType) {
+    private void proceedToNextScreen(String firstName, String userType) {
         Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
 
-        // Redirect to WelcomeScreen
-        Intent intent = new Intent(LoginActivity.this, WelcomeScreen.class);
-        intent.putExtra("FIRST_NAME", firstName != null ? firstName : "");
-        intent.putExtra("userType", userType);
-        startActivity(intent);
-        finish();
+        if (userType.equals("Attendee")) {
+            // Redirect Attendees to AttendeeViewEventsActivity
+            Intent intent = new Intent(LoginActivity.this, AttendeeViewEventsActivity.class);
+            intent.putExtra("FIRST_NAME", firstName != null ? firstName : "");
+            intent.putExtra("userType", userType);
+            startActivity(intent);
+            finish();
+        } else {
+            // Redirect Organizers and Admins to WelcomeScreen
+            Intent intent = new Intent(LoginActivity.this, WelcomeScreen.class);
+            intent.putExtra("FIRST_NAME", firstName != null ? firstName : "");
+            intent.putExtra("userType", userType);
+            startActivity(intent);
+            finish();
+        }
     }
 }
