@@ -2,15 +2,12 @@ package com.example.eventmanagementsystemems;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.text.method.PasswordTransformationMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.example.eventmanagementsystemems.R;
 import com.example.eventmanagementsystemems.entities.Attendee;
 
 import java.util.ArrayList;
@@ -67,11 +64,15 @@ public class AttendeeListAdapter extends BaseAdapter {
 
             builder.setPositiveButton("Approve", (dialog, id) -> {
                 // Approve the registration
-                ((EventDetailActivity) context).approveRegistration(attendee.getUserId());
+                if (context instanceof EventDetailActivity) {
+                    ((EventDetailActivity) context).approveRegistration(attendee.getUserId());
+                }
             });
             builder.setNegativeButton("Reject", (dialog, id) -> {
                 // Reject the registration
-                ((EventDetailActivity) context).rejectRegistration(attendee.getUserId());
+                if (context instanceof EventDetailActivity) {
+                    ((EventDetailActivity) context).rejectRegistration(attendee.getUserId());
+                }
             });
 
             AlertDialog dialog = builder.create();
