@@ -8,3 +8,6 @@ https://uottawa-my.sharepoint.com/personal/mmale102_uottawa_ca/_layouts/15/guest
 
 Demo video for Deliverable 2:
 https://uottawa-my.sharepoint.com/personal/mmale102_uottawa_ca/_layouts/15/guestaccess.aspx?share=Eee49qBGVk9Lv2se7-O5r1wBpmOfUb4Ru3_ScT_lD-ZJIw&e=X7Ureg
+
+Demo video for Deliverable 3:
+https://drive.google.com/file/d/1rSIcyhmXW5nVDT7tMU40LBqUppb0MTmL/view?usp=sharing
