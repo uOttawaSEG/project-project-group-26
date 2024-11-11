@@ -20,6 +20,11 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
+
+/**
+ * Activity for administrators to manage and review registration requests from attendees and organizers.
+ * Allows admins to approve or reject pending applications, moving users to the appropriate database sections.
+ */
 public class RegistrationRequestsAdmin extends AppCompatActivity {
     // Firebase database reference
     DatabaseReference usersRef;
@@ -60,7 +65,9 @@ public class RegistrationRequestsAdmin extends AppCompatActivity {
         retrieveOrganizers();
     }
 
-    // Method to fetch attendees
+    /**
+     * Fetches pending attendee requests from Firebase, creating an adapter to display them in a ListView.
+     */
     private void retrieveAttendees() {
         attendeesRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

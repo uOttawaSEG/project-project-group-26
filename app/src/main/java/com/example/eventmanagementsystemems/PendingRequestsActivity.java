@@ -25,6 +25,10 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
+/**
+ * Activity for reviewing and managing pending requests from attendees and organizers.
+ * Admins can approve or reject pending applications, moving users between different status sections.
+ */
 public class PendingRequestsActivity extends AppCompatActivity {
     // Firebase database reference
     DatabaseReference usersRef;
@@ -59,6 +63,10 @@ public class PendingRequestsActivity extends AppCompatActivity {
         retrievePendingRequests();
     }
 
+    /**
+     * Retrieves pending attendee and organizer requests from Firebase.
+     * Clears any existing data before populating with fresh data.
+     */
     private void retrievePendingRequests() {
         pendingRequests.clear();
         // Fetch attendees
@@ -103,6 +111,9 @@ public class PendingRequestsActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Fetches pending organizer requests from Firebase and adds them to the pending requests list.
+     */
     private void fetchOrganizers() {
         organizersRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -146,6 +157,10 @@ public class PendingRequestsActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Populates the ListView with the names of users whose requests are pending.
+     * Sets up an item click listener to allow viewing user details.
+     */
     private void updateListView() {
         ArrayList<String> userNames = new ArrayList<>();
         for (User user : pendingRequests) {
@@ -173,6 +188,12 @@ public class PendingRequestsActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Displays a dialog with user details and options to approve or reject the user.
+     *
+     * @param user          The user selected from the pending requests list.
+     * @param currentSection The current section of the user, typically "pending."
+     */
     private void showUserDetailsPopup(User user, String currentSection) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(user.getFirstName() + " " + user.getLastName());
@@ -205,6 +226,13 @@ public class PendingRequestsActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    /**
+     * Moves a user from one section (e.g., "pending") to another (e.g., "accepted" or "rejected").
+     *
+     * @param user         The user to be moved.
+     * @param fromSection  The section to move the user from.
+     * @param toSection    The section to move the user to.
+     */
     private void moveUserBetweenSections(User user, String fromSection, String toSection) {
         String userTypePath = user instanceof Organizer ? "organizers" : "attendees";
         DatabaseReference fromRef = usersRef.child(fromSection).child(userTypePath).child(user.getUserId());

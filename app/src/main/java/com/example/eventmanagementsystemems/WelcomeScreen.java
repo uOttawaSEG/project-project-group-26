@@ -1,4 +1,3 @@
-// WelcomeScreen.java
 package com.example.eventmanagementsystemems;
 
 import android.content.Intent;
@@ -12,6 +11,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.eventmanagementsystemems.accounts.organizer.OrganizerHomeActivity;
 import com.google.firebase.auth.FirebaseAuth;
 
+/**
+ * Welcome screen activity that displays a welcome message to attendees
+ * or redirects organizers to their home screen.
+ */
 public class WelcomeScreen extends AppCompatActivity {
 
     private Button btnLogoff;
@@ -38,7 +41,7 @@ public class WelcomeScreen extends AppCompatActivity {
 
                 Intent intent = new Intent(WelcomeScreen.this, MainActivity.class);
                 startActivity(intent);
-                finish();
+                finish(); // close the welcome screen
             });
         }
     }

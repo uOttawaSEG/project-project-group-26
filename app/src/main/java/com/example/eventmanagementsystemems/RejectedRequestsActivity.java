@@ -25,6 +25,11 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
+
+/**
+ * Activity to display and manage rejected registration requests.
+ * Allows the admin to review rejected applications and move users to accepted status if needed.
+ */
 public class RejectedRequestsActivity extends AppCompatActivity {
     // Firebase database reference
     DatabaseReference usersRef;
@@ -59,6 +64,10 @@ public class RejectedRequestsActivity extends AppCompatActivity {
         retrieveRejectedRequests();
     }
 
+    /**
+     * Retrieves rejected attendee requests from Firebase.
+     * Populates the rejectedRequests list and then proceeds to fetch organizers.
+     */
     private void retrieveRejectedRequests() {
         rejectedRequests.clear();
         // Fetch attendees
@@ -93,6 +102,10 @@ public class RejectedRequestsActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Fetches rejected organizer requests from Firebase.
+     * Adds them to the rejectedRequests list and updates the ListView.
+     */
     private void fetchOrganizers() {
         organizersRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -126,6 +139,10 @@ public class RejectedRequestsActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Updates the ListView with the names of users in the rejectedRequests list.
+     * Sets up an item click listener to allow reviewing user details.
+     */
     private void updateListView() {
         ArrayList<String> userNames = new ArrayList<>();
         for (User user : rejectedRequests) {
@@ -153,6 +170,13 @@ public class RejectedRequestsActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Displays a dialog with user details and an option to approve the user,
+     * moving them from the rejected section to accepted.
+     *
+     * @param user          The user selected from the rejected requests list.
+     * @param currentSection The current section of the user, typically "rejected."
+     */
     private void showUserDetailsPopup(User user, String currentSection) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(user.getFirstName() + " " + user.getLastName());
@@ -180,6 +204,13 @@ public class RejectedRequestsActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    /**
+     * Moves a user from one section (e.g., "rejected") to another (e.g., "accepted") in the database.
+     *
+     * @param user         The user to be moved.
+     * @param fromSection  The section to move the user from.
+     * @param toSection    The section to move the user to.
+     */
     private void moveUserBetweenSections(User user, String fromSection, String toSection) {
         String userTypePath = user instanceof Organizer ? "organizers" : "attendees";
         DatabaseReference fromRef = usersRef.child(fromSection).child(userTypePath).child(user.getUserId());
