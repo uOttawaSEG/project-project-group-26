@@ -18,21 +18,27 @@ import com.google.firebase.database.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+// EventDetailActivity displays the details of a specific event for an organizer and allows managing attendee registrations
 public class EventDetailActivity extends AppCompatActivity {
 
+    // UI elements for displaying event details, list of attendees, and control buttons
     private TextView tvEventDetails;
     private ListView lvAttendees;
     private Button btnApproveAll, btnDeleteEvent;
 
+    // Variables to store event ID, event type (e.g., "upcoming"), and Firebase references
     private String eventId, eventType;
 
     private DatabaseReference eventsRef;
     private DatabaseReference usersRef;
 
+    // Event data and list of attendees
     private Event event;
 
     private ArrayList<Attendee> attendeeList = new ArrayList<>();
     private AttendeeListAdapter adapter;
+
+    // Organizer ID to verify ownership and manage event actions
 
     private String organizerId;
 
@@ -41,11 +47,13 @@ public class EventDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_detail);
 
+        // Initialize UI elements
         tvEventDetails = findViewById(R.id.tvEventDetails);
         lvAttendees = findViewById(R.id.lvAttendees);
         btnApproveAll = findViewById(R.id.btnApproveAll);
         btnDeleteEvent = findViewById(R.id.btnDeleteEvent);
 
+        // Retrieve event ID and type from the intent
         eventId = getIntent().getStringExtra("eventId");
         eventType = getIntent().getStringExtra("eventType");
 
@@ -54,12 +62,20 @@ public class EventDetailActivity extends AppCompatActivity {
         eventsRef = FirebaseDatabase.getInstance().getReference("events").child(eventId);
         usersRef = FirebaseDatabase.getInstance().getReference("users");
 
+        // Fetch and display event details
+
         fetchEventDetails();
+
+        // Set listener for approving all attendee registrations
 
         btnApproveAll.setOnClickListener(view -> approveAllRegistrations());
 
+        // Set listener for deleting the event
+
         btnDeleteEvent.setOnClickListener(view -> deleteEvent());
     }
+
+    // Fetches event details from Firebase and updates the UI
 
     private void fetchEventDetails() {
         eventsRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -67,7 +83,10 @@ public class EventDetailActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot snapshot) {
                 event = snapshot.getValue(Event.class);
 
+                // If the event is upcoming, fetch attendee registrations
+
                 if (event != null) {
+                    // Build event details and display them
                     StringBuilder details = new StringBuilder();
                     details.append("Title: ").append(event.getTitle()).append("\n");
                     details.append("Description: ").append(event.getDescription()).append("\n");
@@ -81,10 +100,12 @@ public class EventDetailActivity extends AppCompatActivity {
                     if (eventType.equals("upcoming")) {
                         fetchAttendeeRegistrations();
                     } else {
+                        // Hide attendees list and approval button for past events
                         lvAttendees.setVisibility(View.GONE);
                         btnApproveAll.setVisibility(View.GONE);
                     }
                 } else {
+                    // Show error if event not found and close the activity
                     Toast.makeText(EventDetailActivity.this, "Event not found.", Toast.LENGTH_SHORT).show();
                     finish();
                 }
@@ -92,11 +113,13 @@ public class EventDetailActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(DatabaseError error) {
+                // Show error message if fetching event details fails
                 Toast.makeText(EventDetailActivity.this, "Failed to fetch event details", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
+    // Fetches the list of attendee registrations for the event
     private void fetchAttendeeRegistrations() {
         HashMap<String, String> registrations = event.getAttendeeRegistrations();
 
@@ -111,6 +134,7 @@ public class EventDetailActivity extends AppCompatActivity {
         attendeeList.clear();
         final int[] remaining = {registrations.size()};
 
+        // Fetch each attendee's details based on registration status
         for (String attendeeId : registrations.keySet()) {
             String status = registrations.get(attendeeId);
             // Include all statuses: pending, accepted, rejected
@@ -142,10 +166,13 @@ public class EventDetailActivity extends AppCompatActivity {
         }
     }
 
+    // Updates the ListView with the list of attendees
     private void updateAttendeeListView() {
         adapter = new AttendeeListAdapter(this, attendeeList);
         lvAttendees.setAdapter(adapter);
     }
+
+    // Approves an individual registration for a specified attendee
 
     public void approveRegistration(String attendeeId) {
         event.addAttendeeRegistration(attendeeId, "accepted");
@@ -160,6 +187,7 @@ public class EventDetailActivity extends AppCompatActivity {
                 });
     }
 
+    // Rejects an individual registration for a specified attendee
     public void rejectRegistration(String attendeeId) {
         event.addAttendeeRegistration(attendeeId, "rejected");
         eventsRef.child("attendeeRegistrations").setValue(event.getAttendeeRegistrations())
@@ -173,12 +201,14 @@ public class EventDetailActivity extends AppCompatActivity {
                 });
     }
 
+    // Approves all pending registrations for the event
     private void approveAllRegistrations() {
         if (attendeeList.isEmpty()) {
             Toast.makeText(this, "No pending registrations to approve.", Toast.LENGTH_SHORT).show();
             return;
         }
 
+        // Approve each attendee's registration
         for (Attendee attendee : attendeeList) {
             event.addAttendeeRegistration(attendee.getUserId(), "accepted");
         }
@@ -194,6 +224,7 @@ public class EventDetailActivity extends AppCompatActivity {
                 });
     }
 
+    // Deletes the event from the database
     private void deleteEvent() {
         // For now, allow deletion
         eventsRef.removeValue().addOnCompleteListener(task -> {
