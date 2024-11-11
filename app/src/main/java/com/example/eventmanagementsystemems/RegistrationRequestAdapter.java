@@ -14,21 +14,36 @@ import com.example.eventmanagementsystemems.entities.Organizer;
 
 import java.util.ArrayList;
 
+
+/**
+ * Adapter class for displaying pending registration requests in a ListView.
+ * Each item in the list represents a user request, with options to approve or reject.
+ */
 public class RegistrationRequestAdapter extends BaseAdapter {
 
     private final Context context;
     private final ArrayList<User> userList; // User is the base class
     private final OnRequestActionListener listener;
 
+    /**
+     * Constructor for the adapter.
+     *
+     * @param context  The context in which the adapter is used.
+     * @param userList List of User objects representing pending registration requests.
+     * @param listener Listener for handling approve/reject actions.
+     */
     public RegistrationRequestAdapter(Context context, ArrayList<User> userList, OnRequestActionListener listener) {
         this.context = context;
         this.userList = userList;
         this.listener = listener;
     }
 
+    /**
+     * Interface for handling approve and reject actions on registration requests.
+     */
     public interface OnRequestActionListener {
-        void onApprove(User user);
-        void onReject(User user);
+        void onApprove(User user); // called when user is approved
+        void onReject(User user); // called when user is rejected
     }
 
     @Override

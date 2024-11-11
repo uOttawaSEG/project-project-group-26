@@ -24,18 +24,27 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
+
+/**
+ * Activity for displaying either upcoming or past events organized by the current user.
+ * Fetches events from Firebase and displays them in a ListView with the option to view event details.
+ */
 public class ViewEventsActivity extends AppCompatActivity {
 
+    // UI components for displaying events and a message when there are no events
     private ListView eventsListView;
     private TextView tvNoEvents;
 
+    // Firebase reference for events and user information
     private DatabaseReference eventsRef;
     private String organizerId;
     private String eventType; // "upcoming" or "past"
 
+    // Lists to hold event objects and titles for display in the ListView
     private ArrayList<Event> eventList = new ArrayList<>();
     private ArrayList<String> eventTitles = new ArrayList<>();
 
+    // Formatter for parsing and comparing event dates
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
     private Date today;
 
@@ -57,6 +66,10 @@ public class ViewEventsActivity extends AppCompatActivity {
         fetchEvents();
     }
 
+    /**
+     * Retrieves events organized by the current user and filters them based on event type
+     * ("upcoming" or "past") compared to the current date.
+     */
     private void fetchEvents() {
         eventsRef.orderByChild("organizerId").equalTo(organizerId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {

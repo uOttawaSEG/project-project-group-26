@@ -7,8 +7,15 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class PendingApplicationActivity extends AppCompatActivity {
 
+    // TextView for displaying the pending application message
     private TextView tvPendingMessage;
 
+    /**
+     * Initializes the PendingApplicationActivity and sets up the UI to display
+     * a message informing users about the pending status of their application.
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
