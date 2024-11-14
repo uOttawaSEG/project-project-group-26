@@ -1,7 +1,7 @@
 package com.example.eventmanagementsystemems;
 
 import org.junit.Test;
-
+import org.junit.Before;
 import static org.junit.Assert.*;
 
 /**
@@ -10,8 +10,20 @@ import static org.junit.Assert.*;
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
 public class ExampleUnitTest {
+
+    private ValidateName nameValidator;
+
+    @Before
+    public void setUp() {
+        nameValidator = new ValidateName();
+    }
+
     @Test
-    public void addition_isCorrect() {
-        assertEquals(4, 2 + 2);
+    public void testNameLengthLessThan10() {
+        assertTrue(nameValidator.isNameLengthValid("marc"));
+    }
+
+    public void testNameLengthGreaterThan10() {
+        assertFalse(nameValidator.isNameLengthValid("this_name_is_too_long"));
     }
 }
