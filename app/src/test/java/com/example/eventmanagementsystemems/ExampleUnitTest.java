@@ -20,7 +20,7 @@ public class ExampleUnitTest {
 
     @Test
     public void testNameLengthLessThan10() {
-        assertTrue(nameValidator.isNameLengthValid("marc"));
+        assertTrue(nameValidator.isNameLengthValid("lourdes"));
     }
 
     public void testNameLengthGreaterThan10() {
