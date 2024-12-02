@@ -134,37 +134,6 @@ public class AttendeeEventDetailActivity extends AppCompatActivity {
                     }
                 });
     }
-
-//    private void cancelRegistration() {
-//        long timeUntilStart = event.getStartTime().getTime() - System.currentTimeMillis();
-//
-//        if (timeUntilStart < 24 * 60 * 60 * 1000) {
-//            Toast.makeText(this, "Cannot cancel registrations within 24 hours of the event.", Toast.LENGTH_SHORT).show();
-//            return;
-//        }
-//
-//        if (!event.getAttendeeRegistrations().get(attendeeId).equalsIgnoreCase("pending") &&
-//                !event.getAttendeeRegistrations().get(attendeeId).equalsIgnoreCase("accepted")) {
-//            Toast.makeText(this, "Only pending or accepted registrations can be canceled.", Toast.LENGTH_SHORT).show();
-//            return;
-//        }
-//
-//        event.getAttendeeRegistrations().remove(attendeeId);
-//
-//        eventRef.child("attendeeRegistrations").setValue(event.getAttendeeRegistrations())
-//                .addOnCompleteListener(task -> {
-//                    if (task.isSuccessful()) {
-//                        Toast.makeText(this, "Registration canceled successfully.", Toast.LENGTH_SHORT).show();
-//                        btnRegister.setEnabled(true);
-//                        btnRegister.setText("Register");
-//                        btnCancelRegistration.setEnabled(false);
-//                        tvRegistrationStatus.setText("Not Registered");
-//                    } else {
-//                        Toast.makeText(this, "Failed to cancel registration.", Toast.LENGTH_SHORT).show();
-//                    }
-//                });
-//    }
-
     private void cancelRegistration() {
         try {
             // Get the start date and time as a `Date` object
