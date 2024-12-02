@@ -10,6 +10,10 @@ import com.example.eventmanagementsystemems.entities.Event;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.*;
 
+import java.text.ParseException;
+import java.util.Date;
+
+
 // Activity that displays event details for an attendee
 // and allows the attendee to register for the event if not already registered.
 public class AttendeeEventDetailActivity extends AppCompatActivity {
@@ -17,6 +21,8 @@ public class AttendeeEventDetailActivity extends AppCompatActivity {
     private TextView tvEventDetails;
     private TextView tvRegistrationStatus;
     private Button btnRegister;
+
+    private Button btnCancelRegistration;
 
     // Variables to store event information and references to Firebase
     private String eventId;
@@ -35,6 +41,8 @@ public class AttendeeEventDetailActivity extends AppCompatActivity {
         tvEventDetails = findViewById(R.id.tvEventDetails);
         tvRegistrationStatus = findViewById(R.id.tvRegistrationStatus);
         btnRegister = findViewById(R.id.btnRegister);
+        btnCancelRegistration = findViewById(R.id.btnCancelRegistration); // Ensure this exists in your layout
+
 
         // Retrieve event ID from the intent and initialize Firebase references
         eventId = getIntent().getStringExtra("eventId");
@@ -46,6 +54,8 @@ public class AttendeeEventDetailActivity extends AppCompatActivity {
 
         // Set an onClickListener for the registration button
         btnRegister.setOnClickListener(view -> registerForEvent());
+        btnCancelRegistration.setOnClickListener(view -> cancelRegistration());
+
     }
 
     // Fetches the event details from the database and updates the UI
@@ -74,6 +84,10 @@ public class AttendeeEventDetailActivity extends AppCompatActivity {
                         status = "Registration Status: " + event.getAttendeeRegistrations().get(attendeeId);
                         btnRegister.setText("Registered (" + event.getAttendeeRegistrations().get(attendeeId) + ")");
                         btnRegister.setEnabled(false);
+                        btnCancelRegistration.setEnabled(true);
+
+                    } else {
+                        btnCancelRegistration.setEnabled(false);
                     }
                     tvRegistrationStatus.setText(status);
                 } else {
@@ -120,4 +134,78 @@ public class AttendeeEventDetailActivity extends AppCompatActivity {
                     }
                 });
     }
+
+//    private void cancelRegistration() {
+//        long timeUntilStart = event.getStartTime().getTime() - System.currentTimeMillis();
+//
+//        if (timeUntilStart < 24 * 60 * 60 * 1000) {
+//            Toast.makeText(this, "Cannot cancel registrations within 24 hours of the event.", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+//
+//        if (!event.getAttendeeRegistrations().get(attendeeId).equalsIgnoreCase("pending") &&
+//                !event.getAttendeeRegistrations().get(attendeeId).equalsIgnoreCase("accepted")) {
+//            Toast.makeText(this, "Only pending or accepted registrations can be canceled.", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+//
+//        event.getAttendeeRegistrations().remove(attendeeId);
+//
+//        eventRef.child("attendeeRegistrations").setValue(event.getAttendeeRegistrations())
+//                .addOnCompleteListener(task -> {
+//                    if (task.isSuccessful()) {
+//                        Toast.makeText(this, "Registration canceled successfully.", Toast.LENGTH_SHORT).show();
+//                        btnRegister.setEnabled(true);
+//                        btnRegister.setText("Register");
+//                        btnCancelRegistration.setEnabled(false);
+//                        tvRegistrationStatus.setText("Not Registered");
+//                    } else {
+//                        Toast.makeText(this, "Failed to cancel registration.", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+//    }
+
+    private void cancelRegistration() {
+        try {
+            // Get the start date and time as a `Date` object
+            Date eventStartDateTime = event.getStartDateTime();
+            long timeUntilStart = eventStartDateTime.getTime() - System.currentTimeMillis();
+
+            // Check if the event starts in less than 24 hours
+            if (timeUntilStart < 24 * 60 * 60 * 1000) {
+                Toast.makeText(this, "Cannot cancel registrations within 24 hours of the event.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Check if the registration status is valid for cancellation
+            String registrationStatus = event.getRegistrationStatus(attendeeId);
+            if (!"pending".equalsIgnoreCase(registrationStatus) && !"accepted".equalsIgnoreCase(registrationStatus)) {
+                Toast.makeText(this, "Only pending or accepted registrations can be canceled.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Remove the attendee's registration from the event
+            event.removeAttendeeRegistration(attendeeId);
+
+            // Update the Firebase database
+            eventRef.child("attendeeRegistrations").setValue(event.getAttendeeRegistrations())
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(this, "Registration canceled successfully.", Toast.LENGTH_SHORT).show();
+                            btnRegister.setEnabled(true);
+                            btnRegister.setText("Register");
+                            btnCancelRegistration.setEnabled(false);
+                            tvRegistrationStatus.setText("Not Registered");
+                        } else {
+                            Toast.makeText(this, "Failed to cancel registration.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+        } catch (ParseException e) {
+            Toast.makeText(this, "Invalid event date or time format.", Toast.LENGTH_SHORT).show();
+        } catch (IllegalStateException e) {
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
 }

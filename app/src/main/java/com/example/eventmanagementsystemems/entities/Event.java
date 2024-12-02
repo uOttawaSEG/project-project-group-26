@@ -1,5 +1,8 @@
 package com.example.eventmanagementsystemems.entities;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 
 public class Event {
@@ -60,6 +63,18 @@ public class Event {
 
     public void setDescription(String description) {
         this.description = description; // Description can be optional
+    }
+
+    public Date getStartDateTime() throws ParseException {
+        if (date == null || startTime == null) {
+            throw new IllegalStateException("Event date or start time is null.");
+        }
+
+        // Define the format for date and time
+        String dateTimeString = date + " " + startTime; // Example: "2024-12-01 14:00"
+        SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
+        return dateTimeFormat.parse(dateTimeString);
     }
 
     public String getDate() {
