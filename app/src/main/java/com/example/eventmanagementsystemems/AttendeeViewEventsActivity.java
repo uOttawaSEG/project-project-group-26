@@ -40,7 +40,6 @@ public class AttendeeViewEventsActivity extends AppCompatActivity {
     // Lists to store events and their titles for display
 
     private ArrayList<Event> eventList = new ArrayList<>();
-    private ArrayList<String> eventTitles = new ArrayList<>();
     private ArrayList<Event> filteredEventList = new ArrayList<>();
 
     // Adapter to manage and display events in the ListView
@@ -157,12 +156,12 @@ public class AttendeeViewEventsActivity extends AppCompatActivity {
             eventsListView.setVisibility(View.VISIBLE);
             if(eventsAdapter == null){
                 //Initialize adapter if its the first time
-                eventsAdapter = new EventsAdapter(AttendeeViewEventsActivity.this, filteredEventList);
+                eventsAdapter = new EventsAdapter(AttendeeViewEventsActivity.this, new ArrayList<>(filteredEventList));
                 eventsListView.setAdapter(eventsAdapter);
             }
             else{
                 //Update the adapter's data and refresh the ListView
-                eventsAdapter.updateView(filteredEventList);
+                eventsAdapter.updateView(new ArrayList<>(filteredEventList));
             }
         }
     }

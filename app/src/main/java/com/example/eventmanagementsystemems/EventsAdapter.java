@@ -12,18 +12,18 @@ import java.util.List;
 public class EventsAdapter extends ArrayAdapter<Event> {
 
     private Context context;
-    private List<Event> eventsList;
+    // Removed the redundant eventsList field
 
     public EventsAdapter(Context context, List<Event> eventsList) {
         super(context, R.layout.event_list_item, eventsList);
         this.context = context;
-        this.eventsList = eventsList;
+        // The eventsList is now managed by the ArrayAdapter
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        Event event = eventsList.get(position);
+        Event event = getItem(position); // Use getItem() instead of eventsList.get(position)
 
         if (convertView == null) {
             convertView = LayoutInflater.from(context).inflate(R.layout.event_list_item, parent, false);
@@ -46,9 +46,9 @@ public class EventsAdapter extends ArrayAdapter<Event> {
     }
 
     public void updateView(List<Event> newEventsList){
-        this.eventsList.clear(); // clear the existing data
-        this.eventsList.addAll(newEventsList); //add the updated data
-        notifyDataSetChanged();//notify the adapter that the data changed
+        clear();
+        addAll(newEventsList); //add the updated data
+        notifyDataSetChanged(); //notify the adapter that the data has changed
     }
 
 }
