@@ -71,7 +71,7 @@ public class AttendeeViewEventsActivity extends AppCompatActivity {
         });
 
         // Listener for the 'Registered Events' button to navigate to the registered events screen
-
+ //tests
         btnRegisteredEvents.setOnClickListener(view -> {
             Intent intent = new Intent(AttendeeViewEventsActivity.this, AttendeeRegisteredEventsActivity.class);
             startActivity(intent);
