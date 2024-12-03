@@ -2,6 +2,9 @@ package com.example.eventmanagementsystemems;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
@@ -11,6 +14,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.eventmanagementsystemems.entities.Event;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -24,10 +28,11 @@ import java.util.ArrayList;
 
 public class AttendeeViewEventsActivity extends AppCompatActivity {
 
-    // UI elements for displaying events and navigation buttons
+    // UI elements for displaying events, navigation buttons, and search bar
     private ListView eventsListView;
     private TextView tvNoEvents;
     private Button btnAvailableEvents, btnRegisteredEvents;
+    private TextInputEditText etSearchBar;
 
     // Firebase database reference to the events node
     private DatabaseReference eventsRef;
@@ -36,6 +41,7 @@ public class AttendeeViewEventsActivity extends AppCompatActivity {
 
     private ArrayList<Event> eventList = new ArrayList<>();
     private ArrayList<String> eventTitles = new ArrayList<>();
+    private ArrayList<Event> filteredEventList = new ArrayList<>();
 
     // Adapter to manage and display events in the ListView
     private EventsAdapter eventsAdapter;
@@ -50,6 +56,7 @@ public class AttendeeViewEventsActivity extends AppCompatActivity {
         tvNoEvents = findViewById(R.id.tvNoEvents);
         btnAvailableEvents = findViewById(R.id.btnAvailableEvents);
         btnRegisteredEvents = findViewById(R.id.btnRegisteredEvents);
+        etSearchBar = findViewById(R.id.searchBar);
 
         // Initialize Firebase database reference
 
@@ -59,10 +66,9 @@ public class AttendeeViewEventsActivity extends AppCompatActivity {
 
         fetchEvents();
 
-        // Listener for the 'Available Events' button (currently on this screen, so no action needed)
 
         btnAvailableEvents.setOnClickListener(view -> {
-            // Already on Available Events
+            fetchEvents();
         });
 
         // Listener for the 'Registered Events' button to navigate to the registered events screen
@@ -70,6 +76,19 @@ public class AttendeeViewEventsActivity extends AppCompatActivity {
         btnRegisteredEvents.setOnClickListener(view -> {
             Intent intent = new Intent(AttendeeViewEventsActivity.this, AttendeeRegisteredEventsActivity.class);
             startActivity(intent);
+        });
+
+        etSearchBar.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                filterEvents(charSequence.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable charSequence) {}
         });
     }
 
@@ -82,31 +101,21 @@ public class AttendeeViewEventsActivity extends AppCompatActivity {
 
                 // Clear previous data to avoid duplication
                 eventList.clear();
-                eventTitles.clear();
+                filteredEventList.clear();
 
                 // Loop through each event in the database and add it to the list
-
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Event event = snapshot.getValue(Event.class);
                     if (event != null) {
                         eventList.add(event);
+                        //Log.d("EventFetched", "Fetched event: " + event.toString());
+
                     }
                 }
+                filteredEventList.addAll(eventList); // Show all events by default
 
                 // Update the UI based on whether there are events
-
-                if (eventList.isEmpty()) {
-                    // Show message if no events are available
-                    tvNoEvents.setVisibility(View.VISIBLE);
-                    eventsListView.setVisibility(View.GONE);
-                } else {
-                    // Show events list if events are available
-                    tvNoEvents.setVisibility(View.GONE);
-                    eventsListView.setVisibility(View.VISIBLE);
-                    // Set up the adapter to display events in the ListView
-                    eventsAdapter = new EventsAdapter(AttendeeViewEventsActivity.this, eventList);
-                    eventsListView.setAdapter(eventsAdapter);
-                }
+                updateUI();
             }
 
             @Override
@@ -115,5 +124,46 @@ public class AttendeeViewEventsActivity extends AppCompatActivity {
                 Toast.makeText(AttendeeViewEventsActivity.this, "Failed to load events. Please try again.", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public void filterEvents(String query) {
+        filteredEventList.clear();
+       // Log.d("FilterEvents", "filtering with query: " + query);
+        if (query.isEmpty()) {
+            filteredEventList.addAll(eventList);
+        } else {
+            for (Event event : eventList) {
+                if (event.getTitle().toLowerCase().contains(query.toLowerCase()) ||
+                        (event.getDescription() != null && event.getDescription().toLowerCase().contains(query.toLowerCase()))
+                ) {
+                    filteredEventList.add(event);
+                    Log.d("FilterEvents", "Matched event: " + event.toString());
+                }
+            }
+        }
+        updateUI();
+
+    }
+
+    public void updateUI(){
+        //Log.d("UpdateUI", "Updating UI. Filtered events count: " + filteredEventList.size());
+        if(filteredEventList.isEmpty()){ //if there are no events that match the query, show "no events available"
+            tvNoEvents.setVisibility(View.VISIBLE);
+            eventsListView.setVisibility(View.GONE);
+        }
+        else{
+            //Display the filtered events
+            tvNoEvents.setVisibility(View.GONE);
+            eventsListView.setVisibility(View.VISIBLE);
+            if(eventsAdapter == null){
+                //Initialize adapter if its the first time
+                eventsAdapter = new EventsAdapter(AttendeeViewEventsActivity.this, filteredEventList);
+                eventsListView.setAdapter(eventsAdapter);
+            }
+            else{
+                //Update the adapter's data and refresh the ListView
+                eventsAdapter.updateView(filteredEventList);
+            }
+        }
     }
 }

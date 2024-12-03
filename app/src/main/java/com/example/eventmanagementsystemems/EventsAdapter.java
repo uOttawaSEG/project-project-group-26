@@ -44,4 +44,11 @@ public class EventsAdapter extends ArrayAdapter<Event> {
 
         return convertView;
     }
+
+    public void updateView(List<Event> newEventsList){
+        this.eventsList.clear(); // clear the existing data
+        this.eventsList.addAll(newEventsList); //add the updated data
+        notifyDataSetChanged();//notify the adapter that the data changed
+    }
+
 }
