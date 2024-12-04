@@ -2,6 +2,7 @@ package com.example.eventmanagementsystemems;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -144,7 +145,11 @@ public class CreateEventActivity extends AppCompatActivity {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Toast.makeText(CreateEventActivity.this, "Event created successfully", Toast.LENGTH_SHORT).show();
+//                        Intent intent = new Intent(CreateEventActivity.this, ManageEventActivity.class);
+//                        intent.putExtra("eventId", eventId); // Pass event ID
+//                        startActivity(intent);
                         finish(); // Close activity
+
                     } else {
                         Toast.makeText(CreateEventActivity.this, "Failed to create event", Toast.LENGTH_SHORT).show();
                     }

@@ -225,15 +225,58 @@ public class EventDetailActivity extends AppCompatActivity {
     }
 
     // Deletes the event from the database
+//    private void deleteEvent() {
+//        // For now, allow deletion
+//        eventsRef.removeValue().addOnCompleteListener(task -> {
+//            if (task.isSuccessful()) {
+//                Toast.makeText(this, "Event deleted.", Toast.LENGTH_SHORT).show();
+//                finish();
+//            } else {
+//                Toast.makeText(this, "Failed to delete event.", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//    }
+
+    // Deletes the event from the database
     private void deleteEvent() {
-        // For now, allow deletion
-        eventsRef.removeValue().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                Toast.makeText(this, "Event deleted.", Toast.LENGTH_SHORT).show();
-                finish();
-            } else {
-                Toast.makeText(this, "Failed to delete event.", Toast.LENGTH_SHORT).show();
+        // Check if there are any approved attendees
+        DatabaseReference attendeeRegistrationsRef = eventsRef.child("attendeeRegistrations");
+
+        attendeeRegistrationsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                boolean hasApprovedAttendees = false;
+
+                // Iterate through attendee registrations
+                for (DataSnapshot attendeeSnapshot : snapshot.getChildren()) {
+                    String status = attendeeSnapshot.getValue(String.class);
+                    if ("accepted".equalsIgnoreCase(status)) {
+                        hasApprovedAttendees = true;
+                        break;
+                    }
+                }
+
+                // If there are approved attendees, show a message and prevent deletion
+                if (hasApprovedAttendees) {
+                    Toast.makeText(EventDetailActivity.this, "Cannot delete event with approved attendees.", Toast.LENGTH_SHORT).show();
+                } else {
+                    // No approved attendees, proceed with deletion
+                    eventsRef.removeValue().addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(EventDetailActivity.this, "Event deleted.", Toast.LENGTH_SHORT).show();
+                            finish();
+                        } else {
+                            Toast.makeText(EventDetailActivity.this, "Failed to delete event.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                Toast.makeText(EventDetailActivity.this, "Failed to check attendee registrations.", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
 }
