@@ -4,11 +4,13 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
+import com.example.eventmanagementsystemems.notifications.ReminderManager;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -51,6 +53,9 @@ public class CreateEventActivity extends AppCompatActivity {
         FirebaseApp.initializeApp(this);
         organizerId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         eventsRef = FirebaseDatabase.getInstance().getReference("events");
+
+        // Create notification channel for reminders
+        ReminderManager.createNotificationChannel(this);
 
         // Initialize UI elements
         etTitle = findViewById(R.id.etTitle);
@@ -139,17 +144,26 @@ public class CreateEventActivity extends AppCompatActivity {
         // Create Event object
         Event event = new Event(eventId, title, description, date, startTime, endTime, address, organizerId, manualApproval);
 
+        // Log event creation
+        Log.d("CreateEventActivity", "Event created: " + event);
+
         // Save to database
         eventsRef.child(eventId).setValue(event)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Toast.makeText(CreateEventActivity.this, "Event created successfully", Toast.LENGTH_SHORT).show();
+
+                        // Schedule the reminder
+                        Log.d("CreateEventActivity", "Scheduling reminder for event: " + event.getTitle());
+                        ReminderManager.scheduleReminder(CreateEventActivity.this, event);
+
                         finish(); // Close activity
                     } else {
                         Toast.makeText(CreateEventActivity.this, "Failed to create event", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
+
 
     // Checks if the start time is before the end time
     private boolean isValidTimeRange(String startTime, String endTime) {
