@@ -1,3 +1,6 @@
+//Since we literally no longer have the welcome screen, im going to move the logoff button to the actual regular screen
+
+
 package com.example.eventmanagementsystemems.accounts.logoff;
 
 import android.content.Intent;

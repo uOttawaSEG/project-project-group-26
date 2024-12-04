@@ -14,11 +14,11 @@ import com.example.eventmanagementsystemems.accounts.login.SignUpActivity;
  */
 public class SignUpActivityTests {
 
-    private ValidateName nameValidator;
+    private Validate nameValidator; //it was ValidateName before
 
     @Ignore
     public void setUp() {
-        nameValidator = new ValidateName();
+        nameValidator = new Validate(); //it was ValidateName before
     }
 
     @Ignore

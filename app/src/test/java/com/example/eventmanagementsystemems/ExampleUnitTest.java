@@ -11,11 +11,11 @@ import static org.junit.Assert.*;
  */
 public class ExampleUnitTest {
 
-    private ValidateName nameValidator;
+    private Validate nameValidator; //it was ValidateName before
 
     @Before
     public void setUp() {
-        nameValidator = new ValidateName();
+        nameValidator = new Validate(); //ValidateName(); one second for a bit, i might make them all classes in one file
     }
 
     @Test

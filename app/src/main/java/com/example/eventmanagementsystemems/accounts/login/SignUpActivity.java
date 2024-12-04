@@ -105,6 +105,60 @@ public class SignUpActivity extends AppCompatActivity {
             return;
         }
 
+
+    // Try to create a new user
+    mAuth.createUserWithEmailAndPassword(emailAddress, password)
+        .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    // Sign-up success
+                    String userId = mAuth.getCurrentUser().getUid();
+
+                    // Create user profile data
+                    Map<String, Object> userProfile = new HashMap<>();
+                    userProfile.put("firstName", firstName);
+                    userProfile.put("lastName", lastName);
+                    userProfile.put("email", emailAddress);
+                    userProfile.put("phoneNumber", phoneNumber);
+                    userProfile.put("address", address);
+                    userProfile.put("userType", userType);
+
+                    // Save user profile data in Realtime Database
+                    String userTypePath = "pending/" + userType.toLowerCase() + "s";
+                    usersRef.child(userTypePath).child(userId).setValue(userProfile)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> dbTask) {
+                                if (dbTask.isSuccessful()) {
+                                    Toast.makeText(SignUpActivity.this, "Registration Successful", Toast.LENGTH_SHORT).show();
+                                    if (userType.equals("Organizer")) {
+                                        Intent intent = new Intent(SignUpActivity.this, EnterOrganizationActivity.class);
+                                        startActivity(intent);
+                                        finish();
+                                    } else {
+                                        mAuth.signOut();
+                                        Intent intent = new Intent(SignUpActivity.this, PendingApplicationActivity.class);
+                                        startActivity(intent);
+                                        finish();
+                                    }
+                                } else {
+                                    Toast.makeText(SignUpActivity.this, "Failed to save user profile", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                } else {
+                    // Handle error during sign-up
+                    if (task.getException() != null && task.getException().getMessage().contains("The email address is already in use")) {
+                        Toast.makeText(SignUpActivity.this, "Email is already in use", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(SignUpActivity.this, "Registration Failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
+    }
+/*before
         // Create user with Firebase Authentication
         mAuth.createUserWithEmailAndPassword(emailAddress, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -164,5 +218,5 @@ public class SignUpActivity extends AppCompatActivity {
                         }
                     }
                 });
-    }
+    }*/
 }

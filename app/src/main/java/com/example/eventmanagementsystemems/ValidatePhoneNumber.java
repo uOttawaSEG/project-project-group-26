@@ -1,3 +1,5 @@
+/* making this class a comment for a bit
+
 package com.example.eventmanagementsystemems;
 
 public class ValidatePhoneNumber {
@@ -5,3 +7,5 @@ public class ValidatePhoneNumber {
         return number.length() <= 10;
         }
 }
+
+*/
