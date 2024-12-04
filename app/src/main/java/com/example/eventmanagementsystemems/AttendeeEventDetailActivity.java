@@ -117,12 +117,6 @@ public class AttendeeEventDetailActivity extends AppCompatActivity {
     }
 
 
-    //@Override
-           // public void onCancelled(@NonNull DatabaseError error) {
-             //   Toast.makeText(AttendeeEventDetailActivity.this, "Failed to fetch registered events.", Toast.LENGTH_SHORT).show();
-            //}
-       // });
-    //}
 
     private void cancelRegistration() {
         try {
@@ -198,11 +192,21 @@ public class AttendeeEventDetailActivity extends AppCompatActivity {
         return conflictFound[0];
     }
 
-    // Utility method to check time overlap
+    // Utility method to check time overlap, ensuring events are on the same day
     private boolean isOverlapping(Event event1, Event event2) {
         try {
-            // Define the time format
-            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+            // Define date and time formats
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); // Adjust to your date format
+            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm"); // Time format
+
+            // Parse the event dates
+            Date date1 = dateFormat.parse(event1.getDate());
+            Date date2 = dateFormat.parse(event2.getDate());
+
+            // Check if the events are on the same day
+            if (!date1.equals(date2)) {
+                return false; // No overlap if dates are different
+            }
 
             // Parse the start and end times into Date objects
             Date start1 = timeFormat.parse(event1.getStartTime());
@@ -210,11 +214,12 @@ public class AttendeeEventDetailActivity extends AppCompatActivity {
             Date start2 = timeFormat.parse(event2.getStartTime());
             Date end2 = timeFormat.parse(event2.getEndTime());
 
-            // Check for overlap
+            // Check for overlap in time
             return start1.before(end2) && start2.before(end1);
         } catch (ParseException e) {
             e.printStackTrace();
             return false; // If parsing fails, assume no overlap
         }
     }
+
 }
