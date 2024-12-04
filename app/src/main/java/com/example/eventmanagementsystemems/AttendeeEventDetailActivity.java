@@ -5,33 +5,26 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.eventmanagementsystemems.entities.Event;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.*;
 
 import java.text.ParseException;
-import java.util.Date;
-import java.util.Calendar;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
-
-// Activity that displays event details for an attendee
-// and allows the attendee to register for the event if not already registered.
 public class AttendeeEventDetailActivity extends AppCompatActivity {
-    // UI elements responsible for displaying event details and registration status
     private TextView tvEventDetails;
     private TextView tvRegistrationStatus;
     private Button btnRegister;
-
     private Button btnCancelRegistration;
 
-    // Variables to store event information and references to Firebase
     private String eventId;
     private DatabaseReference eventRef;
     private FirebaseAuth mAuth;
-
-    // Event data and attendee ID for checking registration status
     private Event event;
     private String attendeeId;
 
@@ -43,10 +36,8 @@ public class AttendeeEventDetailActivity extends AppCompatActivity {
         tvEventDetails = findViewById(R.id.tvEventDetails);
         tvRegistrationStatus = findViewById(R.id.tvRegistrationStatus);
         btnRegister = findViewById(R.id.btnRegister);
-        btnCancelRegistration = findViewById(R.id.btnCancelRegistration); // Ensure this exists in your layout
+        btnCancelRegistration = findViewById(R.id.btnCancelRegistration);
 
-
-        // Retrieve event ID from the intent and initialize Firebase references
         eventId = getIntent().getStringExtra("eventId");
         eventRef = FirebaseDatabase.getInstance().getReference("events").child(eventId);
         mAuth = FirebaseAuth.getInstance();
@@ -54,91 +45,82 @@ public class AttendeeEventDetailActivity extends AppCompatActivity {
 
         fetchEventDetails();
 
-        // Set an onClickListener for the registration button
         btnRegister.setOnClickListener(view -> registerForEvent());
         btnCancelRegistration.setOnClickListener(view -> cancelRegistration());
-
     }
 
-    // Fetches the event details from the database and updates the UI
     private void fetchEventDetails() {
         eventRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                // Retrieve the Event object from the database snapshot
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
                 event = snapshot.getValue(Event.class);
 
                 if (event != null) {
-                    // Build and display event details string
                     StringBuilder details = new StringBuilder();
-                    details.append("Title: ").append(event.getTitle()).append("\n");
-                    details.append("Description: ").append(event.getDescription()).append("\n");
-                    details.append("Date: ").append(event.getDate()).append("\n");
-                    details.append("Start Time: ").append(event.getStartTime()).append("\n");
-                    details.append("End Time: ").append(event.getEndTime()).append("\n");
-                    details.append("Address: ").append(event.getEventAddress()).append("\n");
+                    details.append("Title: ").append(event.getTitle()).append("\n")
+                            .append("Description: ").append(event.getDescription()).append("\n")
+                            .append("Date: ").append(event.getDate()).append("\n")
+                            .append("Start Time: ").append(event.getStartTime()).append("\n")
+                            .append("End Time: ").append(event.getEndTime()).append("\n")
+                            .append("Address: ").append(event.getEventAddress()).append("\n");
 
                     tvEventDetails.setText(details.toString());
 
-                    // Set registration status based on attendee's registration
                     String status = "Not Registered";
                     if (event.getAttendeeRegistrations() != null && event.getAttendeeRegistrations().containsKey(attendeeId)) {
                         status = "Registration Status: " + event.getAttendeeRegistrations().get(attendeeId);
                         btnRegister.setText("Registered (" + event.getAttendeeRegistrations().get(attendeeId) + ")");
                         btnRegister.setEnabled(false);
                         btnCancelRegistration.setEnabled(true);
-
                     } else {
                         btnCancelRegistration.setEnabled(false);
                     }
                     tvRegistrationStatus.setText(status);
                 } else {
-                    // Show an error message and close the activity if the event is not found
                     Toast.makeText(AttendeeEventDetailActivity.this, "Event not found.", Toast.LENGTH_SHORT).show();
                     finish();
                 }
             }
 
             @Override
-            public void onCancelled(DatabaseError error) {
-                // Handle database access errors
-                Toast.makeText(AttendeeEventDetailActivity.this, "Failed to fetch event details", Toast.LENGTH_SHORT).show();
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(AttendeeEventDetailActivity.this, "Failed to fetch event details.", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    // Registers the attendee for the event, if not already registered
     private void registerForEvent() {
-        // Check if the attendee is already registered
         if (event.getAttendeeRegistrations() != null && event.getAttendeeRegistrations().containsKey(attendeeId)) {
             Toast.makeText(this, "You have already registered for this event!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Determine initial registration status based on event approval requirements
-        String initialStatus = event.isManualApproval() ? "pending" : "accepted";
+        if (hasConflict(event)) {
+            Toast.makeText(this, "This event conflicts with another event you are registered for.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        // Register the attendee in the event's registration map
+        String initialStatus = event.isManualApproval() ? "pending" : "accepted";
         event.addAttendeeRegistration(attendeeId, initialStatus);
 
-        // Update registration information in the Firebase database
         eventRef.child("attendeeRegistrations").setValue(event.getAttendeeRegistrations())
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        // Notify the user and update the UI upon successful registration
                         Toast.makeText(this, "Registration " + initialStatus, Toast.LENGTH_SHORT).show();
                         btnRegister.setText("Registered (" + initialStatus + ")");
                         btnRegister.setEnabled(false);
                         tvRegistrationStatus.setText("Registration Status: " + initialStatus);
                     } else {
-                        // Display an error if registration fails
                         Toast.makeText(this, "Failed to register for event.", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
+
+
+
     private void cancelRegistration() {
         try {
-            // Get the start date and time as a `Date` object
+            // Get the start date and time as a Date object
             Date eventStartDateTime = event.getStartDateTime();
             long timeUntilStart = eventStartDateTime.getTime() - System.currentTimeMillis();
 
@@ -179,34 +161,65 @@ public class AttendeeEventDetailActivity extends AppCompatActivity {
         }
     }
 
-    private boolean isOverlapping(String newEventDate, String newEventStartTime, String newEventEndTime,
-                                  String registeredEventDate, String registeredEventStartTime, String registeredEventEndTime){
-        try {
-            // Parse dates
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            Date newDate = dateFormat.parse(newEventDate);
-            Date registeredDate = dateFormat.parse(registeredEventDate);
+    private boolean hasConflict(Event newEvent) {
+        DatabaseReference attendeeEventsRef = FirebaseDatabase.getInstance()
+                .getReference("users")
+                .child(attendeeId)
+                .child("registeredEvents");
 
-            // step 1: check if the events are on the same day. If not, then there is no overlapping
-            if (!newDate.equals(registeredDate)) {
-                return false; // No conflict if dates are different
+        // Use a flag to track conflicts
+        final boolean[] conflictFound = {false};
+
+        attendeeEventsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                for (DataSnapshot eventSnapshot : snapshot.getChildren()) {
+                    Event registeredEvent = eventSnapshot.getValue(Event.class);
+
+                    if (registeredEvent != null && isOverlapping(newEvent, registeredEvent)) {
+                        conflictFound[0] = true;
+                        break;
+                    }
+                }
             }
 
-            // Parse times
-            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
-            Date newStart = timeFormat.parse(newEventStartTime);
-            Date newEnd = timeFormat.parse(newEventEndTime);
-            Date registeredStart = timeFormat.parse(registeredEventStartTime);
-            Date registeredEnd = timeFormat.parse(registeredEventEndTime);
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(AttendeeEventDetailActivity.this, "Failed to fetch registered events.", Toast.LENGTH_SHORT).show();
+            }
+        });
 
-            // step 2: check if time intervals overlap
-            return newStart.before(registeredEnd) && registeredStart.before(newEnd);
-
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return false; // Assume no conflict in case of parsing error
-        }
+        return conflictFound[0];
     }
 
+    // Utility method to check time overlap, ensuring events are on the same day
+    private boolean isOverlapping(Event event1, Event event2) {
+        try {
+            // Define date and time formats
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); // Adjust to your date format
+            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm"); // Time format
+
+            // Parse the event dates
+            Date date1 = dateFormat.parse(event1.getDate());
+            Date date2 = dateFormat.parse(event2.getDate());
+
+            // Check if the events are on the same day
+            if (!date1.equals(date2)) {
+                return false; // No overlap if dates are different
+            }
+
+            // Parse the start and end times into Date objects
+            Date start1 = timeFormat.parse(event1.getStartTime());
+            Date end1 = timeFormat.parse(event1.getEndTime());
+            Date start2 = timeFormat.parse(event2.getStartTime());
+            Date end2 = timeFormat.parse(event2.getEndTime());
+
+            // Check for overlap in time
+            return start1.before(end2) && start2.before(end1);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return false; // If parsing fails, assume no overlap
+        }
+    }
 
 }

@@ -2,6 +2,7 @@ package com.example.eventmanagementsystemems;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -152,12 +153,8 @@ public class CreateEventActivity extends AppCompatActivity {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Toast.makeText(CreateEventActivity.this, "Event created successfully", Toast.LENGTH_SHORT).show();
-
-                        // Schedule the reminder
-                        Log.d("CreateEventActivity", "Scheduling reminder for event: " + event.getTitle());
-                        ReminderManager.scheduleReminder(CreateEventActivity.this, event);
-
                         finish(); // Close activity
+
                     } else {
                         Toast.makeText(CreateEventActivity.this, "Failed to create event", Toast.LENGTH_SHORT).show();
                     }

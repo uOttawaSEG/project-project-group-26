@@ -1,18 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.eventmanagementsystemems">
-
-    <!-- Permissions (must be outside the <application> tag) -->
+    <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Theme.EventManagementSystemEMS">
-
         <activity android:name=".PendingApplicationActivity" />
         <activity android:name=".PendingRequestsActivity" />
         <activity android:name=".RejectedRequestsActivity" />
@@ -29,6 +25,7 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -40,9 +37,6 @@
         <activity android:name=".AttendeeEventDetailActivity" />
         <activity android:name=".AttendeeRegisteredEventsActivity" />
 
-        <!-- BroadcastReceiver for notification -->
-        <receiver android:name=".notifications.ReminderBroadcastReceiver"
-            tools:ignore="MissingClass" />
     </application>
 
 </manifest>
