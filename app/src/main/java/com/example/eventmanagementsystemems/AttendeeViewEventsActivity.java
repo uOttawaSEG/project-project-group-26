@@ -13,13 +13,13 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.eventmanagementsystemems.accounts.logoff.LogoffActivity;
 import com.example.eventmanagementsystemems.entities.Event;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -33,6 +33,7 @@ public class AttendeeViewEventsActivity extends AppCompatActivity {
     private TextView tvNoEvents;
     private Button btnAvailableEvents, btnRegisteredEvents;
     private TextInputEditText etSearchBar;
+    private Button btnLogoff;
 
     // Firebase database reference to the events node
     private DatabaseReference eventsRef;
@@ -56,6 +57,7 @@ public class AttendeeViewEventsActivity extends AppCompatActivity {
         btnAvailableEvents = findViewById(R.id.btnAvailableEvents);
         btnRegisteredEvents = findViewById(R.id.btnRegisteredEvents);
         etSearchBar = findViewById(R.id.searchBar);
+        btnLogoff = findViewById(R.id.btnLogoff);
 
         // Initialize Firebase database reference
 
@@ -75,6 +77,15 @@ public class AttendeeViewEventsActivity extends AppCompatActivity {
         btnRegisteredEvents.setOnClickListener(view -> {
             Intent intent = new Intent(AttendeeViewEventsActivity.this, AttendeeRegisteredEventsActivity.class);
             startActivity(intent);
+        });
+
+        btnLogoff.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Open LogoffActivity to handle the logoff logic
+                Intent intent = new Intent(AttendeeViewEventsActivity.this, LogoffActivity.class);
+                startActivity(intent);
+            }
         });
 
         etSearchBar.addTextChangedListener(new TextWatcher() {

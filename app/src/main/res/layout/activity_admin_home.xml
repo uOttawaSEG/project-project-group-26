@@ -21,4 +21,12 @@
         android:layout_height="wrap_content"
         android:text="Rejected Requests" />
 
+    <Button
+        android:id="@+id/btnLogoff"
+        android:layout_width="125dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
+        android:text="Log Off"
+        android:layout_gravity="center"/>
+
 </LinearLayout>
