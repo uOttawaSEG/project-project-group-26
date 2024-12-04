@@ -28,4 +28,12 @@
         android:layout_height="wrap_content"
         android:text="Past Events" />
 
+    <Button
+        android:id="@+id/btnLogoff"
+        android:layout_width="125dp"
+        android:layout_height="wrap_content"
+        android:text="Log Off"
+        android:layout_marginTop="80dp" />
+
+
 </LinearLayout>
