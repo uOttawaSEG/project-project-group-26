@@ -12,6 +12,8 @@ import com.google.firebase.database.*;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.Calendar;
+import java.text.SimpleDateFormat;
 
 
 // Activity that displays event details for an attendee
@@ -176,5 +178,35 @@ public class AttendeeEventDetailActivity extends AppCompatActivity {
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
+
+    private boolean isOverlapping(String newEventDate, String newEventStartTime, String newEventEndTime,
+                                  String registeredEventDate, String registeredEventStartTime, String registeredEventEndTime){
+        try {
+            // Parse dates
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Date newDate = dateFormat.parse(newEventDate);
+            Date registeredDate = dateFormat.parse(registeredEventDate);
+
+            // step 1: check if the events are on the same day. If not, then there is no overlapping
+            if (!newDate.equals(registeredDate)) {
+                return false; // No conflict if dates are different
+            }
+
+            // Parse times
+            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+            Date newStart = timeFormat.parse(newEventStartTime);
+            Date newEnd = timeFormat.parse(newEventEndTime);
+            Date registeredStart = timeFormat.parse(registeredEventStartTime);
+            Date registeredEnd = timeFormat.parse(registeredEventEndTime);
+
+            // step 2: check if time intervals overlap
+            return newStart.before(registeredEnd) && registeredStart.before(newEnd);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return false; // Assume no conflict in case of parsing error
+        }
+    }
+
 
 }
