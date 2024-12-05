@@ -116,7 +116,6 @@ public class AttendeeEventDetailActivity extends AppCompatActivity {
                 });
     }
 
-
     private void cancelRegistration() {
         try {
             // Get the start date and time as a Date object
@@ -172,8 +171,8 @@ public class AttendeeEventDetailActivity extends AppCompatActivity {
         attendeeEventsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
 
+                if (dataSnapshot.exists()) {
                     // Check registered events
                     if (dataSnapshot.hasChild("accepted")) {
                         for (DataSnapshot eventSnapshot : dataSnapshot.child("accepted").getChildren()) {
@@ -204,7 +203,6 @@ public class AttendeeEventDetailActivity extends AppCompatActivity {
                 Toast.makeText(AttendeeEventDetailActivity.this, "Failed to fetch registered events.", Toast.LENGTH_SHORT).show();
             }
         });
-
         return conflictFound[0];
     }
 
