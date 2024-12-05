@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
+import android.view.Gravity; // Added import for Gravity
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
@@ -16,13 +16,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.eventmanagementsystemems.accounts.logoff.LogoffActivity;
 import com.example.eventmanagementsystemems.entities.Event;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.*;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 // AttendeeViewEventsActivity displays a list of all available events to the attendee
 
@@ -46,6 +47,13 @@ public class AttendeeViewEventsActivity extends AppCompatActivity {
     // Adapter to manage and display events in the ListView
     private EventsAdapter eventsAdapter;
 
+    // Firebase Authentication
+    private FirebaseAuth mAuth;
+    private String attendeeId;
+
+    // Date formatter
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,32 +68,32 @@ public class AttendeeViewEventsActivity extends AppCompatActivity {
         btnLogoff = findViewById(R.id.btnLogoff);
 
         // Initialize Firebase database reference
-
         eventsRef = FirebaseDatabase.getInstance().getReference("events");
 
-        // Fetch and display the list of all events
+        // Initialize Firebase Auth and get attendee ID
+        mAuth = FirebaseAuth.getInstance();
+        attendeeId = mAuth.getCurrentUser().getUid();
 
+        // Fetch and display the list of all events
         fetchEvents();
 
+        // Check for upcoming events and show reminder
+        checkForUpcomingEvents();
 
         btnAvailableEvents.setOnClickListener(view -> {
             fetchEvents();
         });
 
         // Listener for the 'Registered Events' button to navigate to the registered events screen
- //tests
         btnRegisteredEvents.setOnClickListener(view -> {
             Intent intent = new Intent(AttendeeViewEventsActivity.this, AttendeeRegisteredEventsActivity.class);
             startActivity(intent);
         });
 
-        btnLogoff.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Open LogoffActivity to handle the logoff logic
-                Intent intent = new Intent(AttendeeViewEventsActivity.this, LogoffActivity.class);
-                startActivity(intent);
-            }
+        btnLogoff.setOnClickListener(view -> {
+            // Open LogoffActivity to handle the logoff logic
+            Intent intent = new Intent(AttendeeViewEventsActivity.this, LogoffActivity.class);
+            startActivity(intent);
         });
 
         etSearchBar.addTextChangedListener(new TextWatcher() {
@@ -118,8 +126,6 @@ public class AttendeeViewEventsActivity extends AppCompatActivity {
                     Event event = snapshot.getValue(Event.class);
                     if (event != null) {
                         eventList.add(event);
-                        //Log.d("EventFetched", "Fetched event: " + event.toString());
-
                     }
                 }
                 filteredEventList.addAll(eventList); // Show all events by default
@@ -138,7 +144,6 @@ public class AttendeeViewEventsActivity extends AppCompatActivity {
 
     public void filterEvents(String query) {
         filteredEventList.clear();
-       // Log.d("FilterEvents", "filtering with query: " + query);
         if (query.isEmpty()) {
             filteredEventList.addAll(eventList);
         } else {
@@ -147,16 +152,13 @@ public class AttendeeViewEventsActivity extends AppCompatActivity {
                         (event.getDescription() != null && event.getDescription().toLowerCase().contains(query.toLowerCase()))
                 ) {
                     filteredEventList.add(event);
-                    Log.d("FilterEvents", "Matched event: " + event.toString());
                 }
             }
         }
         updateUI();
-
     }
 
     public void updateUI(){
-        //Log.d("UpdateUI", "Updating UI. Filtered events count: " + filteredEventList.size());
         if(filteredEventList.isEmpty()){ //if there are no events that match the query, show "no events available"
             tvNoEvents.setVisibility(View.VISIBLE);
             eventsListView.setVisibility(View.GONE);
@@ -166,7 +168,7 @@ public class AttendeeViewEventsActivity extends AppCompatActivity {
             tvNoEvents.setVisibility(View.GONE);
             eventsListView.setVisibility(View.VISIBLE);
             if(eventsAdapter == null){
-                //Initialize adapter if its the first time
+                //Initialize adapter if it's the first time
                 eventsAdapter = new EventsAdapter(AttendeeViewEventsActivity.this, new ArrayList<>(filteredEventList));
                 eventsListView.setAdapter(eventsAdapter);
             }
@@ -175,5 +177,51 @@ public class AttendeeViewEventsActivity extends AppCompatActivity {
                 eventsAdapter.updateView(new ArrayList<>(filteredEventList));
             }
         }
+    }
+
+    private void checkForUpcomingEvents() {
+        eventsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                List<String> upcomingEventTitles = new ArrayList<>();
+                long currentTimeMillis = System.currentTimeMillis();
+                long twentyFourHoursInMillis = 24 * 60 * 60 * 1000;
+
+                for (DataSnapshot eventSnapshot : snapshot.getChildren()) {
+                    Event event = eventSnapshot.getValue(Event.class);
+                    if (event != null && event.getAttendeeRegistrations() != null) {
+                        String registrationStatus = event.getAttendeeRegistrations().get(attendeeId);
+                        if ("accepted".equalsIgnoreCase(registrationStatus)) {
+                            try {
+                                Date eventDateTime = sdf.parse(event.getDate() + " " + event.getStartTime());
+                                if (eventDateTime != null) {
+                                    long timeUntilEvent = eventDateTime.getTime() - currentTimeMillis;
+                                    if (timeUntilEvent > 0 && timeUntilEvent <= twentyFourHoursInMillis) {
+                                        upcomingEventTitles.add(event.getTitle());
+                                    }
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+
+                // Always display the toast, even if there are 0 upcoming events
+                int eventCount = upcomingEventTitles.size();
+                String reminderMessage = "You have " + eventCount + " event"
+                        + (eventCount == 1 ? "" : "s") + " starting within 24 hours.";
+
+                Toast toast = Toast.makeText(AttendeeViewEventsActivity.this, reminderMessage, Toast.LENGTH_LONG);
+                // Set the gravity to display the toast at the top
+                toast.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, 100); // Adjust the yOffset as needed
+                toast.show();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Handle database error
+            }
+        });
     }
 }

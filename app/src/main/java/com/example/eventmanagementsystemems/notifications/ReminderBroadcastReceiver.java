@@ -12,6 +12,6 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
         Log.d("ReminderReceiver", "Reminder triggered for event: " + eventTitle);
 
         // Send the notification
-        com.example.eventmanagementsystemems.notifications.ReminderManager.sendNotification(context, eventTitle);
+        ReminderManager.sendNotification(context, eventTitle);
     }
 }

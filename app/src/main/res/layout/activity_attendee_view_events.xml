@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-
+    <!-- Search Bar -->
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -21,6 +21,7 @@
             android:hint="Search Event" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <!-- Buttons for Event Navigation -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -42,31 +43,17 @@
             android:text="My Registered Events" />
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:gravity="center_horizontal"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/btnLogoff"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Log Off"
-            android:layout_gravity="center"/>
-
-    </LinearLayout>
-
+    <!-- Events List View -->
     <ListView
         android:id="@+id/eventsListView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_height="0dp"
         android:layout_weight="1"
+        android:layout_marginTop="10dp"
         android:divider="@android:color/darker_gray"
         android:dividerHeight="1dp" />
 
+    <!-- No Events Text -->
     <TextView
         android:id="@+id/tvNoEvents"
         android:layout_width="match_parent"
@@ -75,6 +62,14 @@
         android:visibility="gone"
         android:textAlignment="center"
         android:textSize="18sp"
+        android:layout_marginTop="16dp"/>
+
+    <!-- Logoff Button -->
+    <Button
+        android:id="@+id/btnLogoff"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Log Off"
         android:layout_marginTop="16dp"/>
 
 </LinearLayout>
