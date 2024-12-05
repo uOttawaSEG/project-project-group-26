@@ -10,11 +10,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.eventmanagementsystemems.R;
 import com.example.eventmanagementsystemems.PendingRequestsActivity;
 import com.example.eventmanagementsystemems.RejectedRequestsActivity;
+import com.example.eventmanagementsystemems.accounts.logoff.LogoffActivity;
 
 public class AdminHomeActivity extends AppCompatActivity {
 
     private Button btnPendingRequests;
     private Button btnRejectedRequests;
+    private Button btnLogoff;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,7 +25,17 @@ public class AdminHomeActivity extends AppCompatActivity {
 
         btnPendingRequests = findViewById(R.id.btnPendingRequests);
         btnRejectedRequests = findViewById(R.id.btnRejectedRequests);
+        //btnLogoff = findViewById(R.id.btnLogoff)
+        btnLogoff = findViewById(R.id.btnLogoff);
 
+        btnLogoff.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Open LogoffActivity
+                Intent intent = new Intent(AdminHomeActivity.this, LogoffActivity.class);
+                startActivity(intent);
+            }
+        });
         btnPendingRequests.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -39,5 +51,13 @@ public class AdminHomeActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        /*btnLogoff.setOnClickListener(new View.OnClickListener() {
+          /  @Override
+            public void onClick(View view) {
+                LogoffActivity.handleLogoff();
+            }
+        });
+*/
     }
 }

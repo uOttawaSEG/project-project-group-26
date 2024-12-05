@@ -116,8 +116,6 @@ public class AttendeeEventDetailActivity extends AppCompatActivity {
                 });
     }
 
-
-
     private void cancelRegistration() {
         try {
             // Get the start date and time as a Date object
@@ -164,21 +162,38 @@ public class AttendeeEventDetailActivity extends AppCompatActivity {
     private boolean hasConflict(Event newEvent) {
         DatabaseReference attendeeEventsRef = FirebaseDatabase.getInstance()
                 .getReference("users")
-                .child(attendeeId)
-                .child("registeredEvents");
+                .child("attendees")
+                .child(attendeeId);
 
         // Use a flag to track conflicts
-        final boolean[] conflictFound = {false};
+        boolean[] conflictFound = {false};
 
         attendeeEventsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                for (DataSnapshot eventSnapshot : snapshot.getChildren()) {
-                    Event registeredEvent = eventSnapshot.getValue(Event.class);
+            public void onDataChange(DataSnapshot dataSnapshot) {
 
-                    if (registeredEvent != null && isOverlapping(newEvent, registeredEvent)) {
-                        conflictFound[0] = true;
-                        break;
+                if (dataSnapshot.exists()) {
+                    // Check registered events
+                    if (dataSnapshot.hasChild("accepted")) {
+                        for (DataSnapshot eventSnapshot : dataSnapshot.child("accepted").getChildren()) {
+                            Event registeredEvent = eventSnapshot.getValue(Event.class);
+                            if (isOverlapping(newEvent, registeredEvent)) {
+                                conflictFound[0] = true;
+                                break;
+                            }
+                        }
+                    }
+
+
+                    // Check pending events
+                    if (!conflictFound[0] && dataSnapshot.hasChild("pending")) {
+                        for (DataSnapshot eventSnapshot : dataSnapshot.child("pending").getChildren()) {
+                            Event pendingEvent = eventSnapshot.getValue(Event.class);
+                            if (isOverlapping(newEvent, pendingEvent)) {
+                                conflictFound[0] = true;
+                                break;
+                            }
+                        }
                     }
                 }
             }
@@ -188,7 +203,6 @@ public class AttendeeEventDetailActivity extends AppCompatActivity {
                 Toast.makeText(AttendeeEventDetailActivity.this, "Failed to fetch registered events.", Toast.LENGTH_SHORT).show();
             }
         });
-
         return conflictFound[0];
     }
 
@@ -196,7 +210,7 @@ public class AttendeeEventDetailActivity extends AppCompatActivity {
     private boolean isOverlapping(Event event1, Event event2) {
         try {
             // Define date and time formats
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); // Adjust to your date format
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); // Date format
             SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm"); // Time format
 
             // Parse the event dates
@@ -221,5 +235,4 @@ public class AttendeeEventDetailActivity extends AppCompatActivity {
             return false; // If parsing fails, assume no overlap
         }
     }
-
 }

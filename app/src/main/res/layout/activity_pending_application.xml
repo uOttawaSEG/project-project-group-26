@@ -14,7 +14,20 @@
         android:layout_height="wrap_content"
         android:text="Your application is pending.\nYou will receive an email once a decision has been made."
         android:textSize="18sp"
+<<<<<<< HEAD
         android:visibility="visible"
         android:textAlignment="center" />
+=======
+        android:textAlignment="center"
+        android:gravity="center"/>
+
+    <Button
+        android:id="@+id/btnLogoff"
+        android:layout_width="125dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
+        android:text="Log Off"
+        android:layout_gravity="center"/>
+>>>>>>> d3b893ccf1211cc88453a22dbc8a7b37fa8c3356
 
 </LinearLayout>
