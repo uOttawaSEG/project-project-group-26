@@ -95,30 +95,25 @@ public class AttendeeEventDetailActivity extends AppCompatActivity {
             return;
         }
 
-        hasConflict(event, new ConflictCheckCallback() {
-            @Override
-            public void onConflictCheckResult(boolean hasConflict) {
-                if (hasConflict) {
-                    Toast.makeText(AttendeeEventDetailActivity.this, "This event conflicts with another event you are registered for.", Toast.LENGTH_SHORT).show();
-                } else {
-                    // Proceed with registration
-                    String initialStatus = event.isManualApproval() ? "pending" : "accepted";
-                    event.addAttendeeRegistration(attendeeId, initialStatus);
+        if (hasConflict(event)) {
+            Toast.makeText(this, "This event conflicts with another event you are registered for.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-                    eventRef.child("attendeeRegistrations").setValue(event.getAttendeeRegistrations())
-                            .addOnCompleteListener(task -> {
-                                if (task.isSuccessful()) {
-                                    Toast.makeText(AttendeeEventDetailActivity.this, "Registration " + initialStatus, Toast.LENGTH_SHORT).show();
-                                    btnRegister.setText("Registered (" + initialStatus + ")");
-                                    btnRegister.setEnabled(false);
-                                    tvRegistrationStatus.setText("Registration Status: " + initialStatus);
-                                } else {
-                                    Toast.makeText(AttendeeEventDetailActivity.this, "Failed to register for event.", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                }
-            }
-        });
+        String initialStatus = event.isManualApproval() ? "pending" : "accepted";
+        event.addAttendeeRegistration(attendeeId, initialStatus);
+
+        eventRef.child("attendeeRegistrations").setValue(event.getAttendeeRegistrations())
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(this, "Registration " + initialStatus, Toast.LENGTH_SHORT).show();
+                        btnRegister.setText("Registered (" + initialStatus + ")");
+                        btnRegister.setEnabled(false);
+                        tvRegistrationStatus.setText("Registration Status: " + initialStatus);
+                    } else {
+                        Toast.makeText(this, "Failed to register for event.", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void cancelRegistration() {
@@ -164,53 +159,74 @@ public class AttendeeEventDetailActivity extends AppCompatActivity {
         }
     }
 
-    // Callback interface
-    interface ConflictCheckCallback {
-        void onConflictCheckResult(boolean hasConflict);
-    }
+    private boolean hasConflict(Event newEvent) {
+        DatabaseReference attendeeEventsRef = FirebaseDatabase.getInstance()
+                .getReference("users")
+                .child("attendees")
+                .child(attendeeId);
 
-    private void hasConflict(Event newEvent, ConflictCheckCallback callback) {
-        DatabaseReference eventsRef = FirebaseDatabase.getInstance().getReference("events");
+        // Use a flag to track conflicts
+        boolean[] conflictFound = {false};
 
-        eventsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        attendeeEventsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                boolean conflictFound = false;
 
-                for (DataSnapshot eventSnapshot : dataSnapshot.getChildren()) {
-                    Event existingEvent = eventSnapshot.getValue(Event.class);
+                if (dataSnapshot.exists()) {
+                    // Check registered events
+                    if (dataSnapshot.hasChild("accepted")) {
+                        for (DataSnapshot eventSnapshot : dataSnapshot.child("accepted").getChildren()) {
+                            Event registeredEvent = eventSnapshot.getValue(Event.class);
+                            if (isOverlapping(newEvent, registeredEvent)) {
+                                conflictFound[0] = true;
+                                break;
+                            }
+                        }
+                    }
 
-                    if (existingEvent != null && existingEvent.getAttendeeRegistrations() != null && existingEvent.getAttendeeRegistrations().containsKey(attendeeId)) {
-                        String status = existingEvent.getAttendeeRegistrations().get(attendeeId);
-                        if (status.equals("accepted") || status.equals("pending")) {
-                            if (isOverlapping(newEvent, existingEvent)) {
-                                conflictFound = true;
+
+                    // Check pending events
+                    if (!conflictFound[0] && dataSnapshot.hasChild("pending")) {
+                        for (DataSnapshot eventSnapshot : dataSnapshot.child("pending").getChildren()) {
+                            Event pendingEvent = eventSnapshot.getValue(Event.class);
+                            if (isOverlapping(newEvent, pendingEvent)) {
+                                conflictFound[0] = true;
                                 break;
                             }
                         }
                     }
                 }
-
-                callback.onConflictCheckResult(conflictFound);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(AttendeeEventDetailActivity.this, "Failed to fetch registered events.", Toast.LENGTH_SHORT).show();
-                callback.onConflictCheckResult(false);
             }
         });
+        return conflictFound[0];
     }
 
     // Utility method to check time overlap, ensuring events are on the same day
     private boolean isOverlapping(Event event1, Event event2) {
         try {
-            SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+            // Define date and time formats
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); // Date format
+            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm"); // Time format
 
-            Date start1 = dateTimeFormat.parse(event1.getDate() + " " + event1.getStartTime());
-            Date end1 = dateTimeFormat.parse(event1.getDate() + " " + event1.getEndTime());
-            Date start2 = dateTimeFormat.parse(event2.getDate() + " " + event2.getStartTime());
-            Date end2 = dateTimeFormat.parse(event2.getDate() + " " + event2.getEndTime());
+            // Parse the event dates
+            Date date1 = dateFormat.parse(event1.getDate());
+            Date date2 = dateFormat.parse(event2.getDate());
+
+            // Check if the events are on the same day
+            if (!date1.equals(date2)) {
+                return false; // No overlap if dates are different
+            }
+
+            // Parse the start and end times into Date objects
+            Date start1 = timeFormat.parse(event1.getStartTime());
+            Date end1 = timeFormat.parse(event1.getEndTime());
+            Date start2 = timeFormat.parse(event2.getStartTime());
+            Date end2 = timeFormat.parse(event2.getEndTime());
 
             // Check for overlap in time
             return start1.before(end2) && start2.before(end1);
