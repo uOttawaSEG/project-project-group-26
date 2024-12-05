@@ -106,8 +106,8 @@ public class SignUpActivity extends AppCompatActivity {
         }
 
 
-    // Try to create a new user
-    mAuth.createUserWithEmailAndPassword(emailAddress, password)
+        // Try to create a new user
+        mAuth.createUserWithEmailAndPassword(emailAddress, password)
         .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
@@ -158,65 +158,5 @@ public class SignUpActivity extends AppCompatActivity {
             }
         });
     }
-/*before
-        // Create user with Firebase Authentication
-        mAuth.createUserWithEmailAndPassword(emailAddress, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign-up success
-                            String userId = mAuth.getCurrentUser().getUid();
 
-                            // Create user profile data
-                            Map<String, Object> userProfile = new HashMap<>();
-                            userProfile.put("firstName", firstName);
-                            userProfile.put("lastName", lastName);
-                            userProfile.put("email", emailAddress);
-                            userProfile.put("phoneNumber", phoneNumber);
-                            userProfile.put("address", address);
-                            userProfile.put("userType", userType);
-
-                            // Modify the database path to include "pending"
-                            String userTypePath = "pending/" + userType.toLowerCase() + "s";
-
-                            // Save user profile data in Realtime Database under "pending/attendees" or "pending/organizers"
-                            usersRef.child(userTypePath).child(userId).setValue(userProfile)
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> dbTask) {
-                                            if (dbTask.isSuccessful()) {
-                                                Toast.makeText(SignUpActivity.this, "Registration Successful", Toast.LENGTH_SHORT).show();
-
-                                                if (userType.equals("Organizer")) {
-                                                    // Redirect to EnterOrganizationActivity to collect organization name
-                                                    Intent intent = new Intent(SignUpActivity.this, EnterOrganizationActivity.class);
-                                                    startActivity(intent);
-                                                    finish();
-                                                } else {
-                                                    // For Attendees, proceed to pending screen
-                                                    // Sign out the user
-                                                    mAuth.signOut();
-
-                                                    // Redirect to Pending Application Screen
-                                                    Intent intent = new Intent(SignUpActivity.this, PendingApplicationActivity.class);
-                                                    startActivity(intent);
-                                                    finish();
-                                                }
-
-                                            } else {
-                                                Toast.makeText(SignUpActivity.this, "Failed to save user profile", Toast.LENGTH_SHORT).show();
-                                                Log.w(TAG, "Error adding document", dbTask.getException());
-                                            }
-                                        }
-                                    });
-
-                        } else {
-                            // If sign-up fails, display a message to the user.
-                            Toast.makeText(SignUpActivity.this, "Registration Failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                        }
-                    }
-                });
-    }*/
 }

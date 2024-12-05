@@ -14,6 +14,7 @@
         android:layout_height="wrap_content"
         android:text="Your application is pending.\nYou will receive an email once a decision has been made."
         android:textSize="18sp"
+        android:visibility="visible"
         android:textAlignment="center" />
 
 </LinearLayout>
