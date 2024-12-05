@@ -16,4 +16,4 @@ Demo video for Deliverable 4:
 https://uottawa-my.sharepoint.com/personal/mmale102_uottawa_ca/_layouts/15/guestaccess.aspx?share=EU2XX0NSDsJJsdt2R7aBh1EBGhozFb3IGWN4K0gMN3neFg&e=tDDfUu
 
 Final demo video:
-https://filebin.net/5eyi6f7xqm6it6fj
+https://uottawa-my.sharepoint.com/personal/lnajj014_uottawa_ca/Documents/Demo.mp4?csf=1&web=1&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=PIwj23
